@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Available Leads — GhanaServe{% endblock %}
+{% block content %}
+<h1>Available leads in your service areas</h1>
+{% if leads %}
+  {% for req in leads %}
+    <div>
+      <h3><a href="{{ url_for('pro.view_lead', request_id=req.id) }}">{{ req.title }}</a></h3>
+      <p>Category: {{ req.category.name }} &mdash; Budget: GH&#8373; {{ req.budget_min or '?' }}–{{ req.budget_max or '?' }} &mdash; {{ 'URGENT' if req.is_urgent else '' }}</p>
+      <p>Posted: {{ req.created_at.strftime('%d %b %Y') }}</p>
+    </div>
+    <hr>
+  {% endfor %}
+{% else %}
+  <p>No open leads in your service areas right now. Check back soon.</p>
+{% endif %}
+{% endblock %}

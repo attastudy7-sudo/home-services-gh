@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Booking Detail — GhanaServe{% endblock %}
+{% block content %}
+<h1>Booking detail</h1>
+<p>Status: <strong>{{ booking.status }}</strong></p>
+<p>Scheduled: {{ booking.scheduled_date }} {{ booking.scheduled_time_slot or '' }}</p>
+<p>Agreed price: GH&#8373; {{ booking.agreed_price }}</p>
+<p>Payment method: {{ booking.payment_method }}</p>
+<p>Payment status: {{ booking.payment_status }}</p>
+<p>Pro: <a href="{{ url_for('pro.public_profile', slug=booking.quote.pro.slug) }}">{{ booking.quote.pro.business_name or booking.quote.pro.user.full_name }}</a></p>
+
+{% if booking.status == 'confirmed' %}
+  <form method="POST" action="{{ url_for('customer.cancel_booking', booking_id=booking.id) }}">
+    <label>Reason for cancellation<br><input type="text" name="reason"></label>
+    <button type="submit" onclick="return confirm('Cancel this booking?')">Cancel booking</button>
+  </form>
+{% endif %}
+
+{% if booking.status == 'completed' %}
+  {% if review %}
+    <p>Your review: {{ review.rating }}/5 &mdash; {{ review.comment }}</p>
+  {% else %}
+    <p><a href="{{ url_for('customer.leave_review', booking_id=booking.id) }}">Leave a review</a></p>
+  {% endif %}
+{% endif %}
+
+<p><a href="{{ url_for('customer.my_bookings') }}">&larr; Back to bookings</a></p>
+{% endblock %}

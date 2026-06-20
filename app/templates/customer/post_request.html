@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% block title %}Post a Request — GhanaServe{% endblock %}
+{% block content %}
+<h1>Post a service request</h1>
+<form method="POST" action="{{ url_for('customer.post_request') }}">
+  <p><label>Title<br><input type="text" name="title" required placeholder="e.g. Fix leaking bathroom pipe"></label></p>
+  <p><label>Category<br>
+    <select name="category_id" id="category_select" required>
+      <option value="">-- Select category --</option>
+      {% for cat in categories %}
+        <option value="{{ cat.id }}">{{ cat.name }}</option>
+      {% endfor %}
+    </select>
+  </label></p>
+  <p><label>Subcategory<br>
+    <select name="subcategory_id" id="subcategory_select">
+      <option value="">-- Select subcategory --</option>
+    </select>
+  </label></p>
+  <p><label>Location<br>
+    <select name="location_index_id" required>
+      <option value="">-- Select your area --</option>
+      {% for loc in locations %}
+        <option value="{{ loc.id }}">{{ loc.area_name }}, {{ loc.city }}</option>
+      {% endfor %}
+    </select>
+  </label></p>
+  <p><label>Description<br><textarea name="description" rows="4" required placeholder="Describe what you need done"></textarea></label></p>
+  <p><label>Budget min (GHS)<br><input type="number" name="budget_min" step="0.01"></label></p>
+  <p><label>Budget max (GHS)<br><input type="number" name="budget_max" step="0.01"></label></p>
+  <p><label>Preferred date<br><input type="date" name="preferred_date"></label></p>
+  <p><label>Preferred time<br>
+    <select name="preferred_time_slot">
+      <option value="flexible">Flexible</option>
+      <option value="morning">Morning</option>
+      <option value="afternoon">Afternoon</option>
+      <option value="evening">Evening</option>
+    </select>
+  </label></p>
+  <p><label><input type="checkbox" name="is_urgent"> This is urgent</label></p>
+  <p>
+    <button type="button" id="locate_btn">Use my location</button>
+    <span id="locate_status"></span>
+    <input type="hidden" name="location_from_gps" id="location_from_gps" value="">
+    <input type="hidden" name="location_lat" id="location_lat">
+    <input type="hidden" name="location_lng" id="location_lng">
+  </p>
+  <p><button type="submit">Post request</button></p>
+</form>
+
+<script>
+document.getElementById('category_select').addEventListener('change', function() {
+  const catId = this.value;
+  const sub = document.getElementById('subcategory_select');
+  sub.innerHTML = '<option value="">Loading...</option>';
+  if (!catId) { sub.innerHTML = '<option value="">-- Select subcategory --</option>'; return; }
+  fetch('/api/subcategories/' + catId)
+    .then(r => r.json())
+    .then(data => {
+      sub.innerHTML = '<option value="">-- Select subcategory --</option>';
+      data.forEach(s => {
+        sub.innerHTML += '<option value="' + s.id + '">' + s.name + '</option>';
+      });
+    });
+});
+
+document.getElementById('locate_btn').addEventListener('click', function() {
+  const status = document.getElementById('locate_status');
+  status.textContent = 'Locating...';
+  navigator.geolocation.getCurrentPosition(function(pos) {
+    fetch('/api/reverse-geocode', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({lat: pos.coords.latitude, lng: pos.coords.longitude})
+    })
+    .then(r => r.json())
+    .then(data => {
+      status.textContent = 'Located: ' + data.area + ', ' + data.city;
+      document.getElementById('location_from_gps').value = '1';
+      document.getElementById('location_lat').value = pos.coords.latitude;
+      document.getElementById('location_lng').value = pos.coords.longitude;
+    });
+  }, function() {
+    status.textContent = 'Location access denied. Please select your area manually.';
+  });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}{{ req.title }} — GhanaServe{% endblock %}
+{% block content %}
+<h1>{{ req.title }}</h1>
+<p>Status: <strong>{{ req.status }}</strong></p>
+<p>{{ req.description }}</p>
+<p>Quotes received: {{ req.quote_count }}</p>
+{% if req.status == 'open' %}
+  <p><a href="{{ url_for('customer.view_quotes', request_id=req.id) }}">View quotes</a></p>
+  <form method="POST" action="{{ url_for('customer.cancel_request', request_id=req.id) }}">
+    <button type="submit" onclick="return confirm('Cancel this request?')">Cancel request</button>
+  </form>
+{% endif %}
+<p><a href="{{ url_for('customer.my_requests') }}">&larr; Back to my requests</a></p>
+{% endblock %}

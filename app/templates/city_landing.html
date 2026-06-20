@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}Home Services in {{ area.city }} — GhanaServe{% endblock %}
+{% block content %}
+<h1>Home professionals in {{ area.area_name }}, {{ area.city }}</h1>
+<p>Browse service categories available in this area.</p>
+<ul>
+  {% for cat in categories %}
+    <li><a href="/{{ area.slug }}/{{ cat.slug }}">{{ cat.name }} in {{ area.area_name }}</a></li>
+  {% endfor %}
+</ul>
+{% endblock %}

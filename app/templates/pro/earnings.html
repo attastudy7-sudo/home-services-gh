@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Earnings — GhanaServe Pro{% endblock %}
+{% block content %}
+<h1>Earnings overview</h1>
+<p>Total earned: GH&#8373; {{ "%.2f"|format(total_earned) }}</p>
+<p>Disbursed: GH&#8373; {{ "%.2f"|format(disbursed) }}</p>
+<p>Pending payout: GH&#8373; {{ "%.2f"|format(pending) }}</p>
+<h2>Completed jobs</h2>
+{% if completed %}
+  {% for booking in completed %}
+    <div>
+      <p>{{ booking.quote.request.title }} &mdash; GH&#8373; {{ booking.pro_payout_amount }} &mdash; Payout: {{ booking.payout_status }} &mdash; {{ booking.completed_at.strftime('%d %b %Y') if booking.completed_at else '' }}</p>
+    </div>
+  {% endfor %}
+{% else %}
+  <p>No completed jobs yet.</p>
+{% endif %}
+{% endblock %}

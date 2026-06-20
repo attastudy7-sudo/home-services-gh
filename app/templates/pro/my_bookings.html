@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}My Bookings — Pro{% endblock %}
+{% block content %}
+<h1>My bookings</h1>
+{% if bookings %}
+  {% for booking in bookings %}
+    <div>
+      <h3><a href="{{ url_for('pro.view_booking', booking_id=booking.id) }}">{{ booking.quote.request.title }}</a></h3>
+      <p>Status: {{ booking.status }} &mdash; Date: {{ booking.scheduled_date }} &mdash; Price: GH&#8373; {{ booking.agreed_price }} &mdash; Your payout: GH&#8373; {{ booking.pro_payout_amount }}</p>
+    </div>
+    <hr>
+  {% endfor %}
+{% else %}
+  <p>No bookings yet.</p>
+{% endif %}
+{% endblock %}

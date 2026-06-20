@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Stalled MoMo Payments — Admin{% endblock %}
+{% block content %}
+<h1>Stalled MoMo payments (callback not received after 2 hours)</h1>
+<p>{{ payments|length }} stalled payment(s).</p>
+{% if payments %}
+  {% for p in payments %}
+    <div>
+      <p>GH&#8373; {{ p.amount }} &mdash; Network: {{ p.momo_network }} &mdash; Wallet: {{ p.payer_momo_number }} &mdash; Ref: {{ p.gateway_ref }} &mdash; Initiated: {{ p.initiated_at.strftime('%d %b %Y %H:%M') }}</p>
+    </div>
+    <hr>
+  {% endfor %}
+{% else %}
+  <p>No stalled payments. All clear.</p>
+{% endif %}
+{% endblock %}

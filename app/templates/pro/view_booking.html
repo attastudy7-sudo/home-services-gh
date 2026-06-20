@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Booking Detail — Pro{% endblock %}
+{% block content %}
+<h1>Booking: {{ booking.quote.request.title }}</h1>
+<p>Status: <strong>{{ booking.status }}</strong></p>
+<p>Scheduled: {{ booking.scheduled_date }}</p>
+<p>Agreed price: GH&#8373; {{ booking.agreed_price }}</p>
+<p>Your payout: GH&#8373; {{ booking.pro_payout_amount }} (payout status: {{ booking.payout_status }})</p>
+<p>Customer payment method: {{ booking.payment_method }}</p>
+
+{% if booking.status == 'in_progress' %}
+  <form method="POST" action="{{ url_for('pro.mark_complete', booking_id=booking.id) }}">
+    <button type="submit">Mark as completed</button>
+  </form>
+{% endif %}
+
+{% if booking.status == 'confirmed' %}
+  <form method="POST" action="{{ url_for('pro.cancel_booking', booking_id=booking.id) }}">
+    <label>Reason<br><input type="text" name="reason"></label>
+    <button type="submit" onclick="return confirm('Cancel this booking?')">Cancel booking</button>
+  </form>
+{% endif %}
+
+<p><a href="{{ url_for('pro.my_bookings') }}">&larr; Back to bookings</a></p>
+{% endblock %}

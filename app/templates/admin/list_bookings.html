@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}All Bookings — Admin{% endblock %}
+{% block content %}
+<h1>All bookings (last 100)</h1>
+{% for booking in bookings %}
+  <div>
+    <p>
+      <a href="{{ url_for('admin.view_booking', booking_id=booking.id) }}">{{ booking.quote.request.title }}</a>
+      &mdash; Status: {{ booking.status }}
+      &mdash; GH&#8373; {{ booking.agreed_price }}
+      &mdash; {{ booking.scheduled_date }}
+    </p>
+  </div>
+{% endfor %}
+{% endblock %}

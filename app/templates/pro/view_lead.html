@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}{{ req.title }} — Lead Detail{% endblock %}
+{% block content %}
+<h1>{{ req.title }}</h1>
+<p>{{ req.description }}</p>
+<p>Budget: GH&#8373; {{ req.budget_min or '?' }} – {{ req.budget_max or '?' }}</p>
+<p>Preferred date: {{ req.preferred_date or 'Flexible' }} ({{ req.preferred_time_slot or 'Any time' }})</p>
+<p>{{ 'URGENT REQUEST' if req.is_urgent else '' }}</p>
+{% if existing_quote %}
+  <p>You have already submitted a quote (status: {{ existing_quote.status }}).</p>
+{% else %}
+  <p><a href="{{ url_for('pro.submit_quote', request_id=req.id) }}">Submit a quote</a></p>
+{% endif %}
+<p><a href="{{ url_for('pro.leads') }}">&larr; Back to leads</a></p>
+{% endblock %}

@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}My Requests — GhanaServe{% endblock %}
+{% block content %}
+<h1>My service requests</h1>
+<p><a href="{{ url_for('customer.post_request') }}">+ Post a new request</a></p>
+{% if requests %}
+  {% for req in requests %}
+    <div>
+      <h3><a href="{{ url_for('customer.view_request', request_id=req.id) }}">{{ req.title }}</a></h3>
+      <p>Status: {{ req.status }} &mdash; Quotes: {{ req.quote_count }} &mdash; Posted: {{ req.created_at.strftime('%d %b %Y') }}</p>
+    </div>
+    <hr>
+  {% endfor %}
+{% else %}
+  <p>You have not posted any requests yet.</p>
+{% endif %}
+{% endblock %}

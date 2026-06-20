@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}{{ pro.business_name or pro.user.full_name }} — GhanaServe{% endblock %}
+{% block content %}
+<h1>{{ pro.business_name or pro.user.full_name }}</h1>
+<p>Rating: {{ pro.avg_rating }}/5 ({{ pro.total_reviews }} reviews) &mdash; {{ pro.total_jobs }} jobs completed</p>
+<p>Experience: {{ pro.years_experience }} year(s)</p>
+<p>{{ pro.bio or 'No bio provided.' }}</p>
+{% if pro.base_hourly_rate %}
+  <p>Starting from GH&#8373; {{ pro.base_hourly_rate }}/hr</p>
+{% endif %}
+<p><a href="{{ url_for('customer.post_request') }}">Post a request to hire this pro</a></p>
+<h2>Reviews</h2>
+{% if reviews %}
+  {% for review in reviews %}
+    <div>
+      <p>{{ review.rating }}/5 &mdash; {{ review.comment or 'No comment.' }} &mdash; {{ review.created_at.strftime('%d %b %Y') }}</p>
+    </div>
+    <hr>
+  {% endfor %}
+{% else %}
+  <p>No reviews yet.</p>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Pro Detail — Admin{% endblock %}
+{% block content %}
+<h1>Pro: {{ pro.business_name or pro.user.full_name }}</h1>
+<p>Status: <strong>{{ pro.verification_status }}</strong></p>
+<p>Email: {{ pro.user.email }} &mdash; Phone: {{ pro.user.phone }}</p>
+<p>Bio: {{ pro.bio or 'Not provided' }}</p>
+<p>Years experience: {{ pro.years_experience }}</p>
+<p>Ghana Card URL: {{ pro.ghana_card_url or 'Not uploaded' }}</p>
+<p>Certificate URL: {{ pro.certificate_url or 'Not uploaded' }}</p>
+<p>Jobs: {{ pro.total_jobs }} &mdash; Rating: {{ pro.avg_rating }}/5</p>
+
+<form method="POST" action="{{ url_for('admin.approve_pro', pro_id=pro.id) }}" style="display:inline">
+  <input type="text" name="note" placeholder="Note (optional)">
+  <button type="submit">Approve</button>
+</form>
+<form method="POST" action="{{ url_for('admin.reject_pro', pro_id=pro.id) }}" style="display:inline">
+  <input type="text" name="note" placeholder="Reason">
+  <button type="submit">Reject</button>
+</form>
+<form method="POST" action="{{ url_for('admin.suspend_pro', pro_id=pro.id) }}" style="display:inline">
+  <input type="text" name="note" placeholder="Reason">
+  <button type="submit">Suspend</button>
+</form>
+
+<p><a href="{{ url_for('admin.pending_pros') }}">&larr; Back</a></p>
+{% endblock %}

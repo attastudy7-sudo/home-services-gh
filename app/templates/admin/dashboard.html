@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Admin Dashboard — GhanaServe{% endblock %}
+{% block content %}
+<h1>Admin dashboard</h1>
+<p>Pending pro approvals: <strong>{{ pending_pros }}</strong> &mdash; <a href="{{ url_for('admin.pending_pros') }}">Review now</a></p>
+<p>Total users: {{ total_users }}</p>
+<p>Active bookings: {{ active_bookings }}</p>
+<p>Stalled MoMo payments: <strong>{{ stalled_payments }}</strong> &mdash; <a href="{{ url_for('admin.stalled_momo') }}">View</a></p>
+<ul>
+  <li><a href="{{ url_for('admin.pending_pros') }}">Pending pro approvals</a></li>
+  <li><a href="{{ url_for('admin.list_users') }}">All users</a></li>
+  <li><a href="{{ url_for('admin.list_bookings') }}">All bookings</a></li>
+  <li><a href="{{ url_for('admin.list_payments') }}">All payments</a></li>
+  <li><a href="{{ url_for('admin.list_categories') }}">Manage categories</a></li>
+</ul>
+{% endblock %}

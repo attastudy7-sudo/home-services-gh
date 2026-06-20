@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}{{ category.name }} in {{ area.area_name }} — GhanaServe{% endblock %}
+{% block content %}
+<h1>{{ category.name }} professionals in {{ area.area_name }}</h1>
+<p>{{ pros|length }} verified professional(s) available.</p>
+
+{% if pros %}
+  {% for pro in pros %}
+    <div>
+      <h3><a href="{{ url_for('pro.public_profile', slug=pro.slug) }}">{{ pro.business_name or pro.user.full_name }}</a></h3>
+      <p>Rating: {{ pro.avg_rating }}/5 ({{ pro.total_reviews }} reviews) &mdash; {{ pro.total_jobs }} jobs completed</p>
+      <p>{{ pro.bio or 'No bio provided.' }}</p>
+    </div>
+    <hr>
+  {% endfor %}
+{% else %}
+  <p>No pros found in this area yet. <a href="{{ url_for('customer.post_request') }}">Post a request</a> and we will match you.</p>
+{% endif %}
+{% endblock %}

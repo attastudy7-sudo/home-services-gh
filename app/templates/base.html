@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}GhanaServe{% endblock %}</title>
+</head>
+<body>
+
+<nav>
+  <a href="{{ url_for('index') }}"><strong>GhanaServe</strong></a>
+  &nbsp;|&nbsp;
+  {% if current_user.is_authenticated %}
+    <a href="{{ url_for('customer.dashboard') }}">My Dashboard</a>
+    {% if current_user.is_pro %}
+      &nbsp;| <a href="{{ url_for('pro.dashboard') }}">Pro Dashboard</a>
+    {% endif %}
+    {% if current_user.is_admin %}
+      &nbsp;| <a href="{{ url_for('admin.dashboard') }}">Admin</a>
+    {% endif %}
+    &nbsp;| <a href="{{ url_for('auth.logout') }}">Logout ({{ current_user.full_name }})</a>
+  {% else %}
+    <a href="{{ url_for('auth.login') }}">Login</a>
+    &nbsp;| <a href="{{ url_for('auth.register') }}">Register</a>
+    &nbsp;| <a href="{{ url_for('auth.register_pro') }}">Join as a Pro</a>
+  {% endif %}
+</nav>
+
+<hr>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    {% for category, message in messages %}
+      <p>[{{ category | upper }}] {{ message }}</p>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
+
+<main>
+  {% block content %}{% endblock %}
+</main>
+
+<hr>
+<footer>
+  <p>GhanaServe &mdash; Connecting homeowners with trusted professionals in Ghana.</p>
+</footer>
+
+</body>
+</html>

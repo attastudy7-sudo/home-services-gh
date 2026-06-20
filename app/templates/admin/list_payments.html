@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}All Payments — Admin{% endblock %}
+{% block content %}
+<h1>All payments (last 100)</h1>
+{% for payment in payments %}
+  <div>
+    <p>GH&#8373; {{ payment.amount }} &mdash; {{ payment.gateway }} &mdash; Status: {{ payment.status }} &mdash; MoMo: {{ payment.momo_network or '—' }} &mdash; {{ payment.initiated_at.strftime('%d %b %Y %H:%M') }}</p>
+  </div>
+{% endfor %}
+{% endblock %}

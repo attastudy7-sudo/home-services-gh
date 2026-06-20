@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}My Dashboard — GhanaServe{% endblock %}
+{% block content %}
+<h1>Welcome, {{ current_user.full_name }}</h1>
+<p>Open requests: {{ open_requests }} &mdash; Active bookings: {{ active_bookings }}</p>
+<ul>
+  <li><a href="{{ url_for('customer.post_request') }}">Post a new service request</a></li>
+  <li><a href="{{ url_for('customer.my_requests') }}">View my requests</a></li>
+  <li><a href="{{ url_for('customer.my_bookings') }}">View my bookings</a></li>
+  <li><a href="{{ url_for('customer.profile') }}">My profile</a></li>
+</ul>
+{% endblock %}

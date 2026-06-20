@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Pro Profile — GhanaServe{% endblock %}
+{% block content %}
+<h1>My pro profile</h1>
+<p>Business: {{ pro.business_name }}</p>
+<p>Status: {{ pro.verification_status }}</p>
+<p>Rating: {{ pro.avg_rating }}/5 ({{ pro.total_reviews }} reviews)</p>
+<p>Jobs completed: {{ pro.total_jobs }}</p>
+<p>Bio: {{ pro.bio or 'Not set' }}</p>
+<p>Years experience: {{ pro.years_experience }}</p>
+<p>Base hourly rate: GH&#8373; {{ pro.base_hourly_rate or 'Not set' }}</p>
+<p>Availability: {{ pro.availability_note or 'Not set' }}</p>
+<p><a href="{{ url_for('pro.edit_profile') }}">Edit profile</a></p>
+<p><a href="{{ url_for('pro.public_profile', slug=pro.slug) }}">View public profile</a></p>
+{% endblock %}

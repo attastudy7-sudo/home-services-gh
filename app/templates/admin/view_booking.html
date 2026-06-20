@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Booking Detail — Admin{% endblock %}
+{% block content %}
+<h1>Booking: {{ booking.quote.request.title }}</h1>
+<p>Status: <strong>{{ booking.status }}</strong></p>
+<p>Customer: {{ booking.quote.request.customer.full_name }}</p>
+<p>Pro: {{ booking.quote.pro.business_name or booking.quote.pro.user.full_name }}</p>
+<p>Price: GH&#8373; {{ booking.agreed_price }} &mdash; Commission: GH&#8373; {{ booking.platform_commission }} &mdash; Pro payout: GH&#8373; {{ booking.pro_payout_amount }}</p>
+<p>Payout status: {{ booking.payout_status }}</p>
+<p>Payment: {{ booking.payment_method }} / {{ booking.payment_status }}</p>
+{% if booking.status == 'disputed' %}
+  <form method="POST" action="{{ url_for('admin.resolve_dispute', booking_id=booking.id) }}">
+    <label>Resolve as:
+      <select name="resolution">
+        <option value="completed">Completed</option>
+        <option value="cancelled">Cancelled</option>
+      </select>
+    </label>
+    <input type="text" name="note" placeholder="Resolution note">
+    <button type="submit">Resolve dispute</button>
+  </form>
+{% endif %}
+<p><a href="{{ url_for('admin.list_bookings') }}">&larr; Back</a></p>
+{% endblock %}

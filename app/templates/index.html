@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}GhanaServe — Find Home Professionals in Ghana{% endblock %}
+{% block content %}
+<h1>Find trusted home professionals near you</h1>
+<p>GhanaServe connects you with verified plumbers, electricians, cleaners, and more across Accra.</p>
+
+<form method="GET" action="{{ url_for('customer.post_request') }}">
+  <label>What service do you need?</label><br>
+  <select name="category">
+    <option value="">-- Select a service --</option>
+    {% for cat in categories %}
+      <option value="{{ cat.slug }}">{{ cat.name }}</option>
+    {% endfor %}
+  </select>
+  <button type="submit">Find Pros</button>
+</form>
+
+<h2>Service categories</h2>
+<ul>
+  {% for cat in categories %}
+    <li><a href="/accra/{{ cat.slug }}">{{ cat.name }}</a></li>
+  {% endfor %}
+</ul>
+
+<h2>Available in</h2>
+<ul>
+  {% for city in cities %}
+    <li>{{ city[0] }}</li>
+  {% endfor %}
+</ul>
+
+<p>
+  <a href="{{ url_for('auth.register') }}">Create an account</a> to post a request &mdash;
+  or <a href="{{ url_for('auth.register_pro') }}">join as a professional</a>.
+</p>
+{% endblock %}

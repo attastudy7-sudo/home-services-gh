@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}All Users — Admin{% endblock %}
+{% block content %}
+<h1>All users ({{ users|length }})</h1>
+{% for user in users %}
+  <div>
+    <p><a href="{{ url_for('admin.view_user', user_id=user.id) }}">{{ user.full_name }}</a> &mdash; {{ user.email }} &mdash; {{ user.role }} &mdash; Active: {{ user.is_active }} &mdash; Joined: {{ user.created_at.strftime('%d %b %Y') }}</p>
+  </div>
+{% endfor %}
+{% endblock %}

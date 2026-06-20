@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Register — GhanaServe{% endblock %}
+{% block content %}
+<h1>Create a customer account</h1>
+<form method="POST" action="{{ url_for('auth.register') }}">
+  <p><label>Full name<br><input type="text" name="full_name" required></label></p>
+  <p><label>Email<br><input type="email" name="email" required></label></p>
+  <p><label>Phone (+233...)<br><input type="text" name="phone" required></label></p>
+  <p><label>Password<br><input type="password" name="password" required></label></p>
+  <p><button type="submit">Create account</button></p>
+</form>
+<p>Want to offer services? <a href="{{ url_for('auth.register_pro') }}">Register as a Pro</a></p>
+{% endblock %}

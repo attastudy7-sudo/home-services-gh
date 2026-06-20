@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}Edit Pro Profile — GhanaServe{% endblock %}
+{% block content %}
+<h1>Edit pro profile</h1>
+<form method="POST" action="{{ url_for('pro.edit_profile') }}">
+  <p><label>Full name<br><input type="text" name="full_name" value="{{ current_user.full_name }}" required></label></p>
+  <p><label>Business name<br><input type="text" name="business_name" value="{{ pro.business_name or '' }}" required></label></p>
+  <p><label>Phone<br><input type="text" name="phone" value="{{ current_user.phone }}" required></label></p>
+  <p><button type="submit">Save changes</button></p>
+</form>
+{% endblock %}

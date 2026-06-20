@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Pro Dashboard — GhanaServe{% endblock %}
+{% block content %}
+<h1>Pro dashboard — {{ pro.business_name or current_user.full_name }}</h1>
+<p>Verification status: <strong>{{ pro.verification_status }}</strong></p>
+{% if pro.verification_status == 'pending' %}
+  <p>Your profile is under review. You will be notified once approved.</p>
+{% endif %}
+<p>Open leads: {{ open_leads }} &mdash; Active bookings: {{ active_bookings }} &mdash; Pending quotes: {{ pending_quotes }}</p>
+<ul>
+  <li><a href="{{ url_for('pro.leads') }}">Browse leads</a></li>
+  <li><a href="{{ url_for('pro.my_bookings') }}">My bookings</a></li>
+  <li><a href="{{ url_for('pro.earnings') }}">Earnings</a></li>
+  <li><a href="{{ url_for('pro.profile') }}">My pro profile</a></li>
+</ul>
+{% endblock %}

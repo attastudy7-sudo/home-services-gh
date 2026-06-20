@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}User Detail — Admin{% endblock %}
+{% block content %}
+<h1>User: {{ user.full_name }}</h1>
+<p>Email: {{ user.email }} &mdash; Phone: {{ user.phone }}</p>
+<p>Role: {{ user.role }} &mdash; Active: {{ user.is_active }} &mdash; Verified: {{ user.is_verified }}</p>
+<p>Pro profile: {{ 'Yes' if user.pro_profile else 'No' }}</p>
+{% if user.is_active %}
+  <form method="POST" action="{{ url_for('admin.suspend_user', user_id=user.id) }}">
+    <input type="text" name="note" placeholder="Reason for suspension">
+    <button type="submit" onclick="return confirm('Suspend this user?')">Suspend user</button>
+  </form>
+{% else %}
+  <p>This user is suspended.</p>
+{% endif %}
+<p><a href="{{ url_for('admin.list_users') }}">&larr; Back to users</a></p>
+{% endblock %}

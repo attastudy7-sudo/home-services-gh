@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Quotes for {{ req.title }} — GhanaServe{% endblock %}
+{% block content %}
+<h1>Quotes for: {{ req.title }}</h1>
+{% if quotes %}
+  {% for quote in quotes %}
+    <div>
+      <h3>GH&#8373; {{ quote.amount }} &mdash; {{ quote.pro.business_name or quote.pro.user.full_name }}</h3>
+      <p>{{ quote.message }}</p>
+      <p>Available: {{ quote.available_date }} &mdash; Est. hours: {{ quote.estimated_hours or 'Not specified' }}</p>
+      <p>Pro rating: {{ quote.pro.avg_rating }}/5</p>
+      <form method="POST" action="{{ url_for('customer.accept_quote', quote_id=quote.id) }}">
+        <label>Payment method:
+          <select name="payment_method">
+            <option value="cash">Cash on completion</option>
+            <option value="momo">Mobile Money</option>
+          </select>
+        </label>
+        <button type="submit">Accept this quote</button>
+      </form>
+    </div>
+    <hr>
+  {% endfor %}
+{% else %}
+  <p>No quotes yet. Check back soon.</p>
+{% endif %}
+<p><a href="{{ url_for('customer.view_request', request_id=req.id) }}">&larr; Back to request</a></p>
+{% endblock %}

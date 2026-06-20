@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Join as a Pro — GhanaServe{% endblock %}
+{% block content %}
+<h1>Register as a service professional</h1>
+<p>Your profile will be reviewed and approved by our team before going live.</p>
+<form method="POST" action="{{ url_for('auth.register_pro') }}">
+  <p><label>Full name<br><input type="text" name="full_name" required></label></p>
+  <p><label>Business name<br><input type="text" name="business_name" required></label></p>
+  <p><label>Email<br><input type="email" name="email" required></label></p>
+  <p><label>Phone (+233...)<br><input type="text" name="phone" required></label></p>
+  <p><label>Password<br><input type="password" name="password" required></label></p>
+  <p><button type="submit">Apply as a Pro</button></p>
+</form>
+{% endblock %}
