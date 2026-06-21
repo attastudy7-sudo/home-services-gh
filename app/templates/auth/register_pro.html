@@ -1,14 +1,88 @@
 {% extends "base.html" %}
 {% block title %}Join as a Pro — GhanaServe{% endblock %}
-{% block content %}
-<h1>Register as a service professional</h1>
-<p>Your profile will be reviewed and approved by our team before going live.</p>
-<form method="POST" action="{{ url_for('auth.register_pro') }}">
-  <p><label>Full name<br><input type="text" name="full_name" required></label></p>
-  <p><label>Business name<br><input type="text" name="business_name" required></label></p>
-  <p><label>Email<br><input type="email" name="email" required></label></p>
-  <p><label>Phone (+233...)<br><input type="text" name="phone" required></label></p>
-  <p><label>Password<br><input type="password" name="password" required></label></p>
-  <p><button type="submit">Apply as a Pro</button></p>
-</form>
+{% block nav %}{% endblock %}
+{% block extra_css %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.24.0/dist/tabler-icons.min.css">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
 {% endblock %}
+{% block content %}
+<div class="ga-page">
+
+  <div class="ga-brand">
+    <a href="{{ url_for('index') }}" class="ga-brand-logo">GhanaServe</a>
+    <div class="ga-brand-body">
+      <h2 class="ga-brand-headline">Grow your business<br>with GhanaServe</h2>
+      <p class="ga-brand-sub">Reach customers across Accra and Kumasi. Set your own rates, choose your areas, and get paid via MoMo after every job. Free to join.</p>
+      <div class="ga-brand-stats">
+        <div>
+          <div class="ga-brand-stat-num">Free</div>
+          <div class="ga-brand-stat-label">To join</div>
+        </div>
+        <div>
+          <div class="ga-brand-stat-num">MoMo</div>
+          <div class="ga-brand-stat-label">Instant payouts</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ga-form-panel">
+    <div class="ga-form-inner">
+      <h1 class="ga-form-title">Apply as a professional</h1>
+      <p class="ga-form-subtitle">Your profile will be reviewed and approved by our team before going live.</p>
+
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="ga-alerts">
+          {% for category, message in messages %}
+          <div class="ga-alert ga-alert--{{ category }}">{{ message }}</div>
+          {% endfor %}
+        </div>
+        {% endif %}
+      {% endwith %}
+
+      <form method="POST" action="{{ url_for('auth.register_pro') }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+        <div class="ga-field">
+          <label class="ga-label" for="full_name">Full name</label>
+          <input class="ga-input" type="text" id="full_name" name="full_name" placeholder="Kwame Mensah" required autofocus>
+        </div>
+
+        <div class="ga-field">
+          <label class="ga-label" for="business_name">Business name</label>
+          <input class="ga-input" type="text" id="business_name" name="business_name" placeholder="Kwame Plumbing Services" required>
+        </div>
+
+        <div class="ga-field">
+          <label class="ga-label" for="email">Email address</label>
+          <input class="ga-input" type="email" id="email" name="email" placeholder="you@example.com" required>
+        </div>
+
+        <div class="ga-field">
+          <label class="ga-label" for="phone">Phone number</label>
+          <input class="ga-input" type="text" id="phone" name="phone" placeholder="+233 XX XXX XXXX" required>
+          <div class="ga-input-hint">Customers will contact you via this number</div>
+        </div>
+
+        <div class="ga-field">
+          <label class="ga-label" for="password">Password</label>
+          <input class="ga-input" type="password" id="password" name="password" placeholder="At least 8 characters" required minlength="8">
+        </div>
+
+        <button type="submit" class="ga-btn">Submit application</button>
+      </form>
+
+      <div class="ga-form-links">
+        <div class="ga-divider"></div>
+        <p>Already have an account? <a href="{{ url_for('auth.login') }}">Log in</a></p>
+        <p>Looking for services instead? <a href="{{ url_for('auth.register') }}">Create a customer account</a></p>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+{% block footer %}{% endblock %}

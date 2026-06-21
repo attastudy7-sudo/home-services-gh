@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Select Your Services — GhanaServe{% endblock %}
+{% block content %}
+<h1>Select the services you offer</h1>
+<form method="POST" action="{{ url_for('pro.onboarding_services') }}">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  {% for cat in categories %}
+    <fieldset class="mb-1em">
+      <legend>
+        <label>
+          <input type="checkbox" name="category_ids" value="{{ cat.id }}"
+            {{ 'checked' if cat.id in selected_cats else '' }}
+            onchange="toggleSubcategories(this, 'sub_{{ cat.id }}')">
+          <strong>{{ cat.name }}</strong>
+        </label>
+      </legend>
+      <div id="sub_{{ cat.id }}" class="ml-2em">
+        {% for sub in cat.subcategories %}
+          <label>
+            <input type="checkbox" name="subcategory_ids" value="{{ sub.id }}"
+              {{ 'checked' if sub.id in selected_subs else '' }}>
+            {{ sub.name }}
+          </label><br>
+        {% endfor %}
+      </div>
+    </fieldset>
+  {% endfor %}
+  <p><button type="submit">Save &amp; continue to service areas</button></p>
+</form>
+<script>
+function toggleSubcategories(cb, containerId) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+  const checkboxes = container.querySelectorAll('input[type="checkbox"]');
+  checkboxes.forEach(chk => { chk.checked = cb.checked; });
+}
+</script>
+{% endblock %}

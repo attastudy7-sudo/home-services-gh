@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Pending Payouts — Admin{% endblock %}
+{% block content %}
+<h1>Pending payouts ({{ bookings|length }})</h1>
+{% if bookings %}
+  {% for b in bookings %}
+    <div>
+      <p>
+        <strong>{{ b.quote.request.title }}</strong> &mdash;
+        Pro: {{ b.quote.pro.business_name or b.quote.pro.user.full_name }} &mdash;
+        Amount: GH&#8373; {{ b.pro_payout_amount }} &mdash;
+        Completed: {{ b.completed_at.strftime('%d %b %Y') if b.completed_at else 'N/A' }}
+      </p>
+      <form method="POST" action="{{ url_for('admin.disburse_payout', booking_id=b.id) }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button type="submit" onclick="return confirm('Disburse GHS {{ b.pro_payout_amount }} to pro?')">Disburse payout</button>
+      </form>
+    </div>
+    <hr>
+  {% endfor %}
+{% else %}
+  <p>No pending payouts.</p>
+{% endif %}
+<p><a href="{{ url_for('admin.dashboard') }}">&larr; Dashboard</a></p>
+{% endblock %}

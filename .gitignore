@@ -4,5 +4,6 @@ __pycache__/
 venv/
 .env
 instance/*.db
+static/uploads/
 .DS_Store
 *.swp

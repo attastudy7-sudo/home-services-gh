@@ -7,6 +7,7 @@
 <p>Pro profile: {{ 'Yes' if user.pro_profile else 'No' }}</p>
 {% if user.is_active %}
   <form method="POST" action="{{ url_for('admin.suspend_user', user_id=user.id) }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     <input type="text" name="note" placeholder="Reason for suspension">
     <button type="submit" onclick="return confirm('Suspend this user?')">Suspend user</button>
   </form>

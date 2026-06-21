@@ -6,6 +6,25 @@
 {% if pro.verification_status == 'pending' %}
   <p>Your profile is under review. You will be notified once approved.</p>
 {% endif %}
+{% set missing = [] %}
+{% if not current_user.phone %}{% set _ = missing.append('phone number') %}{% endif %}
+{% if not pro.business_name %}{% set _ = missing.append('business name') %}{% endif %}
+{% if not pro.bio %}{% set _ = missing.append('bio') %}{% endif %}
+{% if not pro.base_hourly_rate %}{% set _ = missing.append('hourly rate') %}{% endif %}
+{% if not pro.ghana_card_url %}{% set _ = missing.append('Ghana card') %}{% endif %}
+{% if pro.service_areas.count() == 0 %}{% set _ = missing.append('service areas') %}{% endif %}
+{% if missing %}
+  <p class="alert alert-danger">
+    Complete your profile: <strong>{{ missing | join(', ') }}</strong>
+    — <a href="{{ url_for('pro.edit_profile') }}">Edit profile</a>
+  </p>
+{% endif %}
+<p>Available for new jobs: <strong>{{ 'Yes' if pro.is_available else 'No' }}</strong>
+  <form method="POST" action="{{ url_for('pro.toggle_availability') }}" style="display:inline">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <button type="submit">{{ 'Go unavailable' if pro.is_available else 'Go available' }}</button>
+  </form>
+</p>
 <p>Open leads: {{ open_leads }} &mdash; Active bookings: {{ active_bookings }} &mdash; Pending quotes: {{ pending_quotes }}</p>
 <ul>
   <li><a href="{{ url_for('pro.leads') }}">Browse leads</a></li>

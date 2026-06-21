@@ -7,10 +7,12 @@
     <div>
       <h3><a href="{{ url_for('admin.view_pro', pro_id=pro.id) }}">{{ pro.business_name or pro.user.full_name }}</a></h3>
       <p>Applied: {{ pro.created_at.strftime('%d %b %Y') }} &mdash; Email: {{ pro.user.email }}</p>
-      <form method="POST" action="{{ url_for('admin.approve_pro', pro_id=pro.id) }}" style="display:inline">
+      <form method="POST" action="{{ url_for('admin.approve_pro', pro_id=pro.id) }}" class="d-inline">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <button type="submit">Approve</button>
       </form>
-      <form method="POST" action="{{ url_for('admin.reject_pro', pro_id=pro.id) }}" style="display:inline">
+      <form method="POST" action="{{ url_for('admin.reject_pro', pro_id=pro.id) }}" class="d-inline">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <button type="submit">Reject</button>
       </form>
     </div>

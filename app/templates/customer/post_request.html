@@ -3,6 +3,7 @@
 {% block content %}
 <h1>Post a service request</h1>
 <form method="POST" action="{{ url_for('customer.post_request') }}">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
   <p><label>Title<br><input type="text" name="title" required placeholder="e.g. Fix leaking bathroom pipe"></label></p>
   <p><label>Category<br>
     <select name="category_id" id="category_select" required>

@@ -1,12 +1,15 @@
+import json
 from flask import render_template, redirect, url_for, flash, request, session, abort
 from flask_login import login_required, current_user
 from app.blueprints.customer import customer_bp
-from app.extensions import db
+from app.extensions import db, csrf
 from app.models.marketplace import ServiceRequest, Quote, Booking
-from app.models.financial import Review
+from app.models.financial import Review, Payment
 from app.models.service import ServiceCategory, ServiceSubcategory
 from app.models.location import LocationIndex
 from app.helpers import coerce_uuid, coerce_date, coerce_money, coerce_float
+from app.notification_service import notify_quote_accepted, notify_booking_confirmed, notify_booking_cancelled, notify_review_received, notify_payment_received
+from datetime import datetime
 
 
 @customer_bp.route('/dashboard')
@@ -117,6 +120,8 @@ def accept_quote(quote_id):
         Quote.status == 'pending'
     ).update({'status': 'rejected'})
     db.session.add(booking)
+    notify_quote_accepted(quote.pro.user_id, booking.id, req.title)
+    notify_booking_confirmed(current_user.id, booking.id, req.title)
     db.session.commit()
     flash('Quote accepted. Booking confirmed!', 'success')
     return redirect(url_for('customer.view_booking', booking_id=booking.id))
@@ -152,6 +157,8 @@ def cancel_booking(booking_id):
     booking.status = 'cancelled'
     booking.cancellation_by = 'customer'
     booking.cancellation_reason = request.form.get('reason', '')
+    notify_booking_cancelled(booking.quote.pro.user_id, booking.id,
+        booking.quote.request.title, request.form.get('reason', ''))
     db.session.commit()
     flash('Booking cancelled.', 'info')
     return redirect(url_for('customer.my_bookings'))
@@ -182,10 +189,88 @@ def leave_review(booking_id):
         all_reviews = Review.query.filter_by(reviewee_id=booking.pro_id).all()
         pro.avg_rating = round(sum(r.rating for r in all_reviews) / len(all_reviews), 2)
         pro.total_reviews = len(all_reviews)
+        notify_review_received(pro.user_id, booking.id, current_user.full_name)
         db.session.commit()
         flash('Review submitted. Thank you!', 'success')
         return redirect(url_for('customer.view_booking', booking_id=booking.id))
     return render_template('customer/leave_review.html', booking=booking)
+
+
+@customer_bp.route('/bookings/<uuid:booking_id>/pay', methods=['GET', 'POST'])
+@login_required
+def initiate_payment(booking_id):
+    booking = Booking.query.get_or_404(booking_id)
+    if booking.customer_id != current_user.id:
+        abort(403)
+    if request.method == 'POST':
+        gateway = request.form.get('gateway', 'paystack')
+        network = request.form.get('momo_network') if gateway == 'paystack' else None
+        number = request.form.get('momo_number') if network else None
+        payment = Payment(
+            booking_id=booking.id,
+            payer_id=current_user.id,
+            amount=booking.agreed_price,
+            gateway=gateway,
+            type='full_payment',
+            status='pending',
+            momo_network=network,
+            payer_momo_number=number,
+        )
+        db.session.add(payment)
+        db.session.flush()
+        if gateway == 'cash':
+            payment.status = 'success'
+            booking.payment_status = 'paid'
+        else:
+            print(f'[PAYSTACK STUB] Initializing payment for booking {booking.id}')
+            print(f'[PAYSTACK STUB] Amount: GHS {booking.agreed_price}')
+            print(f'[PAYSTACK STUB] Reference: {payment.id}')
+            print(f'[PAYSTACK STUB] Network: {network}, Number: {number}')
+        notify_payment_received(
+            pro_user_id=booking.quote.pro.user_id,
+            booking_id=booking.id,
+            amount=booking.agreed_price,
+            currency=payment.currency,
+        )
+        db.session.commit()
+        flash('Payment initiated successfully.', 'success')
+        return redirect(url_for('customer.view_booking', booking_id=booking.id))
+    return render_template('customer/initiate_payment.html', booking=booking)
+
+
+@csrf.exempt
+@customer_bp.route('/payments/callback', methods=['POST'])
+def payment_callback():
+    payload = request.get_json(silent=True) or {}
+    event = payload.get('event')
+    data = payload.get('data', {})
+    reference = data.get('reference')
+
+    if not reference:
+        return ('', 204)
+
+    if event == 'charge.success':
+        payment = Payment.query.filter_by(gateway_ref=reference).first()
+        if payment and payment.status != 'success':
+            payment.status = 'success'
+            payment.gateway_status = data.get('status', 'success')
+            payment.gateway_response = json.dumps(data)
+            payment.callback_received = True
+            payment.callback_at = datetime.utcnow()
+            payment.confirmed_at = datetime.utcnow()
+            booking = payment.booking
+            if booking:
+                booking.payment_status = 'paid'
+                booking.payment_reference = reference
+                notify_payment_received(
+                    pro_user_id=booking.quote.pro.user_id,
+                    booking_id=booking.id,
+                    amount=payment.amount,
+                    currency=payment.currency,
+                )
+            db.session.commit()
+
+    return ('', 204)
 
 
 @customer_bp.route('/profile')

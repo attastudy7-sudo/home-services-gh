@@ -10,6 +10,7 @@ from app.models.service import ServiceCategory
 from app.models.ops import AdminAction
 from datetime import datetime, timedelta
 from functools import wraps
+from app.notification_service import notify_pro_approved, notify_pro_rejected, notify_payout_sent
 import re
 
 
@@ -75,6 +76,7 @@ def approve_pro(pro_id):
     pro.verification_status = 'approved'
     pro.verified_at = datetime.utcnow()
     log_action('approve_pro', 'pro_profile', pro.id, request.form.get('note', ''))
+    notify_pro_approved(pro.user_id)
     db.session.commit()
     flash(f'{pro.business_name or pro.user.full_name} approved.', 'success')
     return redirect(url_for('admin.pending_pros'))
@@ -86,7 +88,9 @@ def approve_pro(pro_id):
 def reject_pro(pro_id):
     pro = ProProfile.query.get_or_404(pro_id)
     pro.verification_status = 'rejected'
+    pro.slug = f'rejected-{pro.id}'
     log_action('reject_pro', 'pro_profile', pro.id, request.form.get('note', ''))
+    notify_pro_rejected(pro_user_id=pro.user_id)
     db.session.commit()
     flash('Pro rejected.', 'info')
     return redirect(url_for('admin.pending_pros'))
@@ -104,12 +108,17 @@ def suspend_pro(pro_id):
     return redirect(url_for('admin.view_pro', pro_id=pro.id))
 
 
+PAGE_SIZE = 50
+
+
 @admin_bp.route('/users')
 @login_required
 @admin_required
 def list_users():
-    users = User.query.order_by(User.created_at.desc()).all()
-    return render_template('admin/list_users.html', users=users)
+    page = request.args.get('page', 1, type=int)
+    pagination = User.query.order_by(User.created_at.desc()).paginate(page=page, per_page=PAGE_SIZE, error_out=False)
+    users = pagination.items
+    return render_template('admin/list_users.html', users=users, pagination=pagination)
 
 
 @admin_bp.route('/users/<uuid:user_id>')
@@ -136,8 +145,10 @@ def suspend_user(user_id):
 @login_required
 @admin_required
 def list_bookings():
-    bookings = Booking.query.order_by(Booking.created_at.desc()).limit(100).all()
-    return render_template('admin/list_bookings.html', bookings=bookings)
+    page = request.args.get('page', 1, type=int)
+    pagination = Booking.query.order_by(Booking.created_at.desc()).paginate(page=page, per_page=PAGE_SIZE, error_out=False)
+    bookings = pagination.items
+    return render_template('admin/list_bookings.html', bookings=bookings, pagination=pagination)
 
 
 @admin_bp.route('/bookings/<uuid:booking_id>')
@@ -165,8 +176,10 @@ def resolve_dispute(booking_id):
 @login_required
 @admin_required
 def list_payments():
-    payments = Payment.query.order_by(Payment.initiated_at.desc()).limit(100).all()
-    return render_template('admin/list_payments.html', payments=payments)
+    page = request.args.get('page', 1, type=int)
+    pagination = Payment.query.order_by(Payment.initiated_at.desc()).paginate(page=page, per_page=PAGE_SIZE, error_out=False)
+    payments = pagination.items
+    return render_template('admin/list_payments.html', payments=payments, pagination=pagination)
 
 
 @admin_bp.route('/payments/stalled-momo')
@@ -180,6 +193,35 @@ def stalled_momo():
         Payment.status == 'pending'
     ).order_by(Payment.initiated_at).all()
     return render_template('admin/stalled_momo.html', payments=stalled)
+
+
+@admin_bp.route('/payouts')
+@login_required
+@admin_required
+def list_pending_payouts():
+    pending = Booking.query.filter(
+        Booking.status == 'completed',
+        Booking.payout_status == 'pending'
+    ).order_by(Booking.completed_at).all()
+    return render_template('admin/list_pending_payouts.html', bookings=pending)
+
+
+@admin_bp.route('/payouts/<uuid:booking_id>/disburse', methods=['POST'])
+@login_required
+@admin_required
+def disburse_payout(booking_id):
+    booking = Booking.query.get_or_404(booking_id)
+    if booking.payout_status != 'pending':
+        flash('Payout already processed for this booking.', 'warning')
+        return redirect(url_for('admin.list_pending_payouts'))
+    print(f'[PAYSTACK STUB] Disbursing GHS {booking.pro_payout_amount} to pro {booking.pro_id}')
+    booking.payout_status = 'disbursed'
+    booking.payout_disbursed_at = datetime.utcnow()
+    log_action('override_status', 'booking', booking.id, 'Payout disbursed')
+    notify_payout_sent(booking.quote.pro.user_id, booking.id, booking.pro_payout_amount)
+    db.session.commit()
+    flash(f'Payout of GHS {booking.pro_payout_amount} disbursed.', 'success')
+    return redirect(url_for('admin.list_pending_payouts'))
 
 
 @admin_bp.route('/categories')
@@ -197,6 +239,12 @@ def new_category():
     if request.method == 'POST':
         name = request.form.get('name', '').strip()
         slug = re.sub(r'[^a-z0-9]+', '-', name.lower()).strip('-')
+        if ServiceCategory.query.filter_by(slug=slug).first():
+            flash(f'A category with slug "{slug}" already exists.', 'danger')
+            return redirect(url_for('admin.new_category'))
+        if not slug:
+            flash('Category name cannot be empty.', 'danger')
+            return redirect(url_for('admin.new_category'))
         cat = ServiceCategory(name=name, slug=slug)
         db.session.add(cat)
         db.session.commit()

@@ -4,6 +4,7 @@
 <h1>Review your experience</h1>
 <p>Pro: {{ booking.quote.pro.business_name or booking.quote.pro.user.full_name }}</p>
 <form method="POST" action="{{ url_for('customer.leave_review', booking_id=booking.id) }}">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
   <p><label>Rating (1–5)<br>
     <select name="rating" required>
       <option value="5">5 — Excellent</option>

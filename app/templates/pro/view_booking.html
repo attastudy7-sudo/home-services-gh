@@ -10,12 +10,18 @@
 
 {% if booking.status == 'in_progress' %}
   <form method="POST" action="{{ url_for('pro.mark_complete', booking_id=booking.id) }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     <button type="submit">Mark as completed</button>
   </form>
 {% endif %}
 
 {% if booking.status == 'confirmed' %}
+  <form method="POST" action="{{ url_for('pro.start_booking', booking_id=booking.id) }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <button type="submit">Start booking</button>
+  </form>
   <form method="POST" action="{{ url_for('pro.cancel_booking', booking_id=booking.id) }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     <label>Reason<br><input type="text" name="reason"></label>
     <button type="submit" onclick="return confirm('Cancel this booking?')">Cancel booking</button>
   </form>

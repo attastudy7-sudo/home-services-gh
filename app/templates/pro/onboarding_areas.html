@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Select Your Service Areas — GhanaServe{% endblock %}
+{% block content %}
+<h1>Select the areas where you offer services</h1>
+<form method="POST" action="{{ url_for('pro.onboarding_areas') }}">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  {% set current_city = namespace(val='') %}
+  {% for loc in locations %}
+    {% if loc.city != current_city.val %}
+      {% if current_city.val != '' %}</fieldset>{% endif %}
+      {% set current_city.val = loc.city %}
+      <fieldset class="mb-1em">
+      <legend><strong>{{ loc.city }}</strong></legend>
+    {% endif %}
+    <label>
+      <input type="checkbox" name="location_ids" value="{{ loc.id }}"
+        {{ 'checked' if loc.id in selected_areas else '' }}>
+      {{ loc.area_name }}
+    </label><br>
+  {% endfor %}
+  {% if locations %}</fieldset>{% endif %}
+  <p><button type="submit">Save &amp; go to dashboard</button></p>
+</form>
+{% endblock %}

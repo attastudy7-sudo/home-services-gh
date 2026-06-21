@@ -4,6 +4,7 @@
 <h1>Submit a quote</h1>
 <p>For: <strong>{{ req.title }}</strong></p>
 <form method="POST" action="{{ url_for('pro.submit_quote', request_id=req.id) }}">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
   <p><label>Your price (GHS)<br><input type="number" name="amount" step="0.01" required></label></p>
   <p><label>Message to customer<br><textarea name="message" rows="3" required placeholder="Describe your approach and why they should choose you"></textarea></label></p>
   <p><label>Estimated hours<br><input type="number" name="estimated_hours"></label></p>

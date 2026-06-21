@@ -10,6 +10,7 @@
 <p>Payment: {{ booking.payment_method }} / {{ booking.payment_status }}</p>
 {% if booking.status == 'disputed' %}
   <form method="POST" action="{{ url_for('admin.resolve_dispute', booking_id=booking.id) }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     <label>Resolve as:
       <select name="resolution">
         <option value="completed">Completed</option>

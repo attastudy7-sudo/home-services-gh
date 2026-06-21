@@ -1,12 +1,73 @@
 {% extends "base.html" %}
 {% block title %}Login — GhanaServe{% endblock %}
-{% block content %}
-<h1>Login</h1>
-<form method="POST" action="{{ url_for('auth.login') }}">
-  <p><label>Email<br><input type="email" name="email" required></label></p>
-  <p><label>Password<br><input type="password" name="password" required></label></p>
-  <p><button type="submit">Login</button></p>
-</form>
-<p><a href="{{ url_for('auth.forgot_password') }}">Forgot password?</a></p>
-<p>No account? <a href="{{ url_for('auth.register') }}">Register here</a></p>
+{% block nav %}{% endblock %}
+{% block extra_css %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.24.0/dist/tabler-icons.min.css">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
 {% endblock %}
+{% block content %}
+<div class="ga-page">
+
+  <div class="ga-brand">
+    <a href="{{ url_for('index') }}" class="ga-brand-logo">GhanaServe</a>
+    <div class="ga-brand-body">
+      <h2 class="ga-brand-headline">Find trusted home experts<br>across Ghana</h2>
+      <p class="ga-brand-sub">Connect with verified plumbers, electricians, cleaners and more — right in your neighbourhood.</p>
+      <div class="ga-brand-stats">
+        <div>
+          <div class="ga-brand-stat-num">500+</div>
+          <div class="ga-brand-stat-label">Verified Pros</div>
+        </div>
+        <div>
+          <div class="ga-brand-stat-num">21+</div>
+          <div class="ga-brand-stat-label">Areas in Accra</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ga-form-panel">
+    <div class="ga-form-inner">
+      <h1 class="ga-form-title">Welcome back</h1>
+      <p class="ga-form-subtitle">Log in to your GhanaServe account.</p>
+
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="ga-alerts">
+          {% for category, message in messages %}
+          <div class="ga-alert ga-alert--{{ category }}">{{ message }}</div>
+          {% endfor %}
+        </div>
+        {% endif %}
+      {% endwith %}
+
+      <form method="POST" action="{{ url_for('auth.login') }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+        <div class="ga-field">
+          <label class="ga-label" for="email">Email address</label>
+          <input class="ga-input" type="email" id="email" name="email" placeholder="you@example.com" required autofocus>
+        </div>
+
+        <div class="ga-field">
+          <label class="ga-label" for="password">Password</label>
+          <input class="ga-input" type="password" id="password" name="password" placeholder="Your password" required>
+        </div>
+
+        <button type="submit" class="ga-btn">Log in</button>
+      </form>
+
+      <div class="ga-form-links">
+        <p><a href="{{ url_for('auth.forgot_password') }}">Forgot your password?</a></p>
+        <div class="ga-divider"></div>
+        <p>No account yet? <a href="{{ url_for('auth.register') }}">Create one free</a></p>
+        <p>Are you a professional? <a href="{{ url_for('auth.register_pro') }}">Join as a Pro</a></p>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+{% block footer %}{% endblock %}

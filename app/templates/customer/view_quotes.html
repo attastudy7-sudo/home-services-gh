@@ -10,6 +10,7 @@
       <p>Available: {{ quote.available_date }} &mdash; Est. hours: {{ quote.estimated_hours or 'Not specified' }}</p>
       <p>Pro rating: {{ quote.pro.avg_rating }}/5</p>
       <form method="POST" action="{{ url_for('customer.accept_quote', quote_id=quote.id) }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <label>Payment method:
           <select name="payment_method">
             <option value="cash">Cash on completion</option>

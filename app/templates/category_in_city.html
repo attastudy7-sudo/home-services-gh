@@ -1,19 +1,214 @@
 {% extends "base.html" %}
-{% block title %}{{ category.name }} in {{ area.area_name }} — GhanaServe{% endblock %}
-{% block content %}
-<h1>{{ category.name }} professionals in {{ area.area_name }}</h1>
-<p>{{ pros|length }} verified professional(s) available.</p>
 
-{% if pros %}
-  {% for pro in pros %}
-    <div>
-      <h3><a href="{{ url_for('pro.public_profile', slug=pro.slug) }}">{{ pro.business_name or pro.user.full_name }}</a></h3>
-      <p>Rating: {{ pro.avg_rating }}/5 ({{ pro.total_reviews }} reviews) &mdash; {{ pro.total_jobs }} jobs completed</p>
-      <p>{{ pro.bio or 'No bio provided.' }}</p>
+{% block title %}{{ category.name }} in {{ area.area_name }} — GhanaServe{% endblock %}
+
+{% block nav %}{% endblock %}
+
+{% block extra_css %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.24.0/dist/tabler-icons.min.css">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/category.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="gc-page">
+
+  <!-- NAV -->
+  <nav class="gs-nav">
+    <a href="{{ url_for('index') }}" class="gs-nav-logo">GhanaServe</a>
+    <div class="gs-nav-right">
+      <a href="{{ url_for('auth.register_pro') }}" class="gs-btn-join">Join as a pro</a>
+      <div class="gs-nav-icon" title="Cart">
+        <i class="ti ti-shopping-cart" aria-hidden="true"></i>
+      </div>
+      <div class="gs-nav-dropdown-trigger">
+        <button class="gs-nav-icon" title="Account" aria-haspopup="true" aria-expanded="false">
+          <i class="ti ti-user" aria-hidden="true"></i>
+        </button>
+        <div class="gs-nav-dropdown" role="menu">
+          {% if current_user.is_authenticated %}
+            {% if current_user.is_admin %}
+            <div class="gs-dropdown-header">Admin</div>
+            <a class="gs-dropdown-item" href="{{ url_for('admin.dashboard') }}"><i class="ti ti-layout-dashboard"></i> Dashboard</a>
+            <a class="gs-dropdown-item" href="{{ url_for('admin.pending_pros') }}"><i class="ti ti-clock-hour-4"></i> Pending Pros</a>
+            <a class="gs-dropdown-item" href="{{ url_for('admin.list_users') }}"><i class="ti ti-users"></i> Users</a>
+            <a class="gs-dropdown-item" href="{{ url_for('admin.list_bookings') }}"><i class="ti ti-calendar"></i> Bookings</a>
+            <a class="gs-dropdown-item" href="{{ url_for('admin.list_payments') }}"><i class="ti ti-credit-card"></i> Payments</a>
+            <a class="gs-dropdown-item" href="{{ url_for('admin.list_categories') }}"><i class="ti ti-category"></i> Categories</a>
+            {% elif current_user.is_pro %}
+            <div class="gs-dropdown-header">Pro</div>
+            <a class="gs-dropdown-item" href="{{ url_for('pro.dashboard') }}"><i class="ti ti-layout-dashboard"></i> Dashboard</a>
+            <a class="gs-dropdown-item" href="{{ url_for('pro.leads') }}"><i class="ti ti-briefcase"></i> Leads</a>
+            <a class="gs-dropdown-item" href="{{ url_for('pro.my_bookings') }}"><i class="ti ti-calendar"></i> My Bookings</a>
+            <a class="gs-dropdown-item" href="{{ url_for('pro.earnings') }}"><i class="ti ti-coin"></i> Earnings</a>
+            <a class="gs-dropdown-item" href="{{ url_for('pro.profile') }}"><i class="ti ti-user-edit"></i> Profile</a>
+            {% else %}
+            <div class="gs-dropdown-header">Customer</div>
+            <a class="gs-dropdown-item" href="{{ url_for('customer.dashboard') }}"><i class="ti ti-layout-dashboard"></i> Dashboard</a>
+            <a class="gs-dropdown-item" href="{{ url_for('customer.my_requests') }}"><i class="ti ti-file-text"></i> My Requests</a>
+            <a class="gs-dropdown-item" href="{{ url_for('customer.my_bookings') }}"><i class="ti ti-calendar"></i> My Bookings</a>
+            <a class="gs-dropdown-item" href="{{ url_for('customer.profile') }}"><i class="ti ti-user-edit"></i> Profile</a>
+            {% endif %}
+            <div class="gs-dropdown-divider"></div>
+            <a class="gs-dropdown-item" href="{{ url_for('auth.logout') }}"><i class="ti ti-logout"></i> Log out</a>
+          {% else %}
+            <div class="gs-dropdown-header">Account</div>
+            <a class="gs-dropdown-item" href="{{ url_for('auth.login') }}"><i class="ti ti-login"></i> Log in</a>
+            <a class="gs-dropdown-item" href="{{ url_for('auth.register') }}"><i class="ti ti-user-plus"></i> Create account</a>
+            <a class="gs-dropdown-item" href="{{ url_for('auth.register_pro') }}"><i class="ti ti-briefcase"></i> Join as a Pro</a>
+          {% endif %}
+        </div>
+      </div>
     </div>
-    <hr>
-  {% endfor %}
-{% else %}
-  <p>No pros found in this area yet. <a href="{{ url_for('customer.post_request') }}">Post a request</a> and we will match you.</p>
-{% endif %}
+  </nav>
+
+  <!-- HERO BAND -->
+  <div class="gc-hero">
+    <div class="gc-hero-inner">
+      <div class="gc-breadcrumb">
+        <a href="{{ url_for('index') }}">Home</a>
+        <span>/</span>
+        <a href="{{ url_for('city_landing', city_slug=area.slug) }}">{{ area.area_name }}</a>
+        <span>/</span>
+        {{ category.name }}
+      </div>
+      <h1 class="gc-hero-title">{{ category.name }} professionals in {{ area.area_name }}</h1>
+      <p class="gc-hero-meta">
+        <strong>{{ pros|length }}</strong>
+        verified professional{{ 's' if pros|length != 1 else '' }} available
+      </p>
+    </div>
+  </div>
+
+  <!-- SUBCATEGORY FILTER CHIPS -->
+  {% if subcategories %}
+  <div class="gc-filters">
+    <div class="gc-filters-inner">
+      <button class="gc-chip active" data-filter="all" type="button">All {{ category.name }}</button>
+      {% for sub in subcategories %}
+      <button class="gc-chip" data-filter="{{ sub.slug }}" type="button">{{ sub.name }}</button>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- PRO LISTINGS -->
+  <div class="gc-main">
+
+    {% if pros %}
+      {% for pro in pros %}
+      <a href="{{ url_for('pro.public_profile', slug=pro.slug) }}" class="gc-pro-card">
+
+        <!-- Avatar -->
+        <div class="gc-pro-avatar">
+          {{ (pro.business_name or pro.user.full_name)[:1].upper() }}
+        </div>
+
+        <!-- Body -->
+        <div class="gc-pro-body">
+          <div class="gc-pro-name">
+            {{ pro.business_name or pro.user.full_name }}
+            <span class="gc-pro-verified">
+              <i class="ti ti-shield-check"></i> Verified
+            </span>
+          </div>
+
+          <div class="gc-pro-rating">
+            <div class="gc-pro-stars">
+              {% for i in range(1, 6) %}
+                <i class="ti ti-star{% if i <= pro.avg_rating|round %}-filled{% endif %} gc-pro-star{% if i > pro.avg_rating|round %} empty{% endif %}"></i>
+              {% endfor %}
+            </div>
+            <span class="gc-pro-rating-text">
+              {{ "%.1f"|format(pro.avg_rating) }} ({{ pro.total_reviews }} review{{ 's' if pro.total_reviews != 1 else '' }})
+              &middot; {{ pro.total_jobs }} job{{ 's' if pro.total_jobs != 1 else '' }} done
+            </span>
+          </div>
+
+          <p class="gc-pro-bio">{{ pro.bio or 'Verified professional available in ' ~ area.area_name ~ '.' }}</p>
+
+          <div class="gc-pro-tags">
+            {% if pro.years_experience and pro.years_experience > 0 %}
+            <span class="gc-pro-tag">{{ pro.years_experience }} yr{{ 's' if pro.years_experience != 1 else '' }} experience</span>
+            {% endif %}
+            {% if pro.is_available %}
+            <span class="gc-pro-tag" style="background:#e8f5ef;color:#1A7A4A;">Available now</span>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- CTA -->
+        <div class="gc-pro-cta">
+          {% if pro.base_hourly_rate %}
+          <div class="gc-pro-rate">
+            GHS {{ "%.0f"|format(pro.base_hourly_rate) }}
+            <span>per hour</span>
+          </div>
+          {% endif %}
+          <span class="gc-pro-btn">View profile</span>
+        </div>
+
+      </a>
+      {% endfor %}
+
+    {% else %}
+      <div class="gc-empty">
+        <div class="gc-empty-icon"><i class="ti ti-tools"></i></div>
+        <h2 class="gc-empty-title">No pros found in {{ area.area_name }} yet</h2>
+        <p class="gc-empty-body">
+          We don't have a verified {{ category.name|lower }} professional in this area yet.
+          Post a request and we'll match you as soon as one becomes available.
+        </p>
+        <a href="{{ url_for('customer.post_request') }}" class="gc-empty-btn">Post a request</a>
+      </div>
+    {% endif %}
+
+  </div>
+
+</div>
+
+<script>
+(function () {
+  document.querySelectorAll('.gc-chip').forEach(function (chip) {
+    chip.addEventListener('click', function () {
+      document.querySelectorAll('.gc-chip').forEach(function (c) {
+        c.classList.remove('active');
+      });
+      this.classList.add('active');
+    });
+  });
+  var t = document.querySelector('.gs-nav-dropdown-trigger');
+  if (t) {
+    var b = t.querySelector('.gs-nav-icon');
+    var m = t.querySelector('.gs-nav-dropdown');
+    b.addEventListener('click', function(e) { e.stopPropagation(); m.classList.toggle('open'); });
+    document.addEventListener('click', function(e) { if (!t.contains(e.target)) m.classList.remove('open'); });
+  }
+})();
+</script>
+{% endblock %}
+
+{% block footer %}
+<footer class="gs-footer-bar">
+  <div class="gs-footer-inner">
+    <div class="gs-footer-left">
+      <span style="font-weight:700;font-size:1.1rem;color:#111">GhanaServe</span>
+      <span class="gs-footer-copy">© GhanaServe Ltd. 2026</span>
+    </div>
+    <div class="gs-footer-links">
+      <a href="{{ url_for('pages.terms') }}">Terms of Service</a>
+      <a href="{{ url_for('pages.privacy') }}">Privacy Policy</a>
+      <a href="{{ url_for('pages.contact') }}">Contact</a>
+    </div>
+    <div class="gs-footer-right">
+      <a href="#" class="gs-footer-icon" aria-label="TikTok"><i class="ti ti-brand-tiktok" aria-hidden="true"></i></a>
+      <a href="#" class="gs-footer-icon" aria-label="Instagram"><i class="ti ti-brand-instagram" aria-hidden="true"></i></a>
+      <a href="#" class="gs-footer-icon" aria-label="LinkedIn"><i class="ti ti-brand-linkedin" aria-hidden="true"></i></a>
+      <a href="#" class="gs-footer-icon" aria-label="Facebook"><i class="ti ti-brand-facebook" aria-hidden="true"></i></a>
+      <a href="#" class="gs-footer-icon" aria-label="X / Twitter"><i class="ti ti-brand-x" aria-hidden="true"></i></a>
+    </div>
+  </div>
+</footer>
 {% endblock %}

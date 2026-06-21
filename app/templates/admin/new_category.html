@@ -3,6 +3,7 @@
 {% block content %}
 <h1>Add a new service category</h1>
 <form method="POST" action="{{ url_for('admin.new_category') }}">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
   <p><label>Category name<br><input type="text" name="name" required></label></p>
   <p><button type="submit">Create category</button></p>
 </form>
