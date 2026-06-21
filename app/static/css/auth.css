@@ -24,6 +24,31 @@
   position: relative;
   overflow: hidden;
 }
+.ga-brand::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  opacity: 0.35;
+  z-index: 0;
+}
+.ga-brand--login::before {
+  background-image: url('../img/.gs-why-photo-placeholder (3).jpg');
+}
+.ga-brand--register::before {
+  background-image: url('../img/.gs-why-photo-placeholder (2).jpg');
+}
+.ga-brand--reset::before {
+  background-image: url('../img/.gs-popular-inner (5).jpg');
+}
+.ga-brand--pro::before {
+  background-image: url('../img/.gs-why-photo-placeholder (1).jpg');
+}
+.ga-brand > * {
+  position: relative;
+  z-index: 1;
+}
 .ga-brand-logo {
   font-size: 20px;
   font-weight: 700;

@@ -12,28 +12,28 @@ CATEGORIES = [
         ("Geyser repair",        "geyser-repair"),
         ("Leak detection",       "leak-detection"),
     ]),
-    ("Electrical",              "electrical",         2, [
+    ("AC & Appliances",         "ac-appliances",      2, [
+        ("AC installation",      "ac-installation"),
+        ("AC servicing",         "ac-servicing"),
+        ("Fridge repair",        "fridge-repair"),
+        ("Washing machine repair","washing-machine-repair"),
+    ]),
+    ("Electrical",              "electrical",         3, [
         ("Wiring & rewiring",    "wiring-rewiring"),
         ("Socket installation",  "socket-installation"),
         ("Generator servicing",  "generator-servicing"),
         ("Security lighting",    "security-lighting"),
     ]),
-    ("Cleaning & Pest Control", "cleaning-pest",      3, [
+    ("Cleaning & Laundry",       "cleaning-pest",      4, [
         ("House cleaning",       "house-cleaning"),
         ("Post-construction clean","post-construction-clean"),
         ("Pest fumigation",      "pest-fumigation"),
         ("Termite treatment",    "termite-treatment"),
     ]),
-    ("Painting",                "painting",           4, [
+    ("Painting",                "painting",           5, [
         ("Interior painting",    "interior-painting"),
         ("Exterior painting",    "exterior-painting"),
         ("Waterproofing",        "waterproofing"),
-    ]),
-    ("AC & Appliances",         "ac-appliances",      5, [
-        ("AC installation",      "ac-installation"),
-        ("AC servicing",         "ac-servicing"),
-        ("Fridge repair",        "fridge-repair"),
-        ("Washing machine repair","washing-machine-repair"),
     ]),
     ("Carpentry & Furniture",   "carpentry-furniture",6, [
         ("Door installation",    "door-installation"),

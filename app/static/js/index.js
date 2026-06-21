@@ -133,3 +133,25 @@
       });
     })();
   })();
+
+/* ── POPULAR SERVICES TICKER ─────────────────────── */
+(function () {
+  const slides = document.querySelectorAll('.gs-popular-slide');
+  const dots   = document.querySelectorAll('.gs-popular-dot');
+  const bgs    = document.querySelectorAll('.gs-popular-bg');
+  if (!slides.length) return;
+
+  let current = 0;
+
+  function goTo(n) {
+    slides[current].classList.remove('gs-popular-slide--active');
+    dots[current].classList.remove('gs-popular-dot--active');
+    if (bgs[current]) bgs[current].classList.remove('gs-popular-bg--active');
+    current = (n + slides.length) % slides.length;
+    slides[current].classList.add('gs-popular-slide--active');
+    dots[current].classList.add('gs-popular-dot--active');
+    if (bgs[current]) bgs[current].classList.add('gs-popular-bg--active');
+  }
+
+  setInterval(() => goTo(current + 1), 3200);
+}());
