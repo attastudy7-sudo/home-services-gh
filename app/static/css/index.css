@@ -40,7 +40,7 @@
   padding: 108px 2rem 8px;
   text-align: center;
   position: relative;
-  overflow: hidden;
+  overflow-x: clip;
 }
 .gs-hero-stars {
   position: absolute;
@@ -50,7 +50,7 @@
 }
 .gs-hero-blob {
   position: absolute;
-  top: -80px;
+  top: -108px;
   right: -80px;
   width: 420px;
   height: 420px;
@@ -89,7 +89,9 @@
       pointer-events: none;
       transform-origin: left center;
       animation: gs-underline-draw 0.5s ease-out 1.3s both;
-    }
+}
+
+
 
 @keyframes gs-underline-draw {
   from { transform: scaleX(0); }
@@ -102,7 +104,6 @@
 .gs-cats {
   flex-shrink: 0;
   padding: 58px 0 0;
-  border-bottom: 1px solid #e8edf2;
   background: #fff;
 }
 .gs-cats-scroll {
@@ -1352,8 +1353,8 @@
   .gs-pill-left { min-width: 130px; padding: 0 1rem; font-size: 13px; }
   .gs-pill-right { padding: 0 1rem; font-size: 13px; }
 
-  /* ── CATEGORY ROW — 3-column grid ── */
-  .gs-cats { padding: 4px 0 0; margin-bottom: 32px; }
+  /* ── CATEGORY ROW — hidden on mobile ── */
+  .gs-cats { display: none; }
   .gs-cats-scroll { padding: 0 1.25rem; justify-content: flex-start; }
   .gs-cat-card { padding: 12px 14px 0; }
   .gs-cat-icon-wrap { width: 38px; height: 38px; }
@@ -1512,5 +1513,7 @@
   .gs-area-grid { grid-template-columns: repeat(3, 1fr); }
 
 }
+
+
 
 
