@@ -54,12 +54,14 @@ def create_app(config_name='default'):
     def category_in_city(city_slug, category_slug):
         from app.models.location import LocationIndex
         from app.models.service import ServiceCategory, ServiceSubcategory
-        from app.models.pro import ProProfile, ProServiceArea, ProCategory
+        from app.models.pro import ProProfile, ProServiceArea, ProCategory, ProSubcategory
+
         area = LocationIndex.query.filter_by(slug=city_slug).first_or_404()
         category = ServiceCategory.query.filter_by(slug=category_slug, is_active=True).first_or_404()
         subcategories = ServiceSubcategory.query.filter_by(
             category_id=category.id, is_active=True
         ).order_by(ServiceSubcategory.name).all()
+
         pros = (ProProfile.query
             .join(ProServiceArea, ProServiceArea.pro_id == ProProfile.id)
             .join(ProCategory, ProCategory.pro_id == ProProfile.id)
@@ -69,7 +71,24 @@ def create_app(config_name='default'):
                 ProProfile.verification_status == 'approved',
                 ProProfile.is_available == True
             ).order_by(ProProfile.avg_rating.desc()).all())
+
+        rates = []
+        if pros:
+            subcat_rows = (db.session.query(ProSubcategory.pro_id, ServiceSubcategory.slug)
+                .join(ServiceSubcategory, ServiceSubcategory.id == ProSubcategory.subcategory_id)
+                .filter(ProSubcategory.pro_id.in_([p.id for p in pros]))
+                .all())
+            pro_subcat_slugs = {}
+            for pro_id, slug in subcat_rows:
+                pro_subcat_slugs.setdefault(pro_id, []).append(slug)
+            for pro in pros:
+                pro.subcat_slugs = pro_subcat_slugs.get(pro.id, [])
+                if pro.base_hourly_rate:
+                    rates.append(float(pro.base_hourly_rate))
+
         return render_template('category_in_city.html',
-            area=area, category=category, subcategories=subcategories, pros=pros)
+            area=area, category=category, subcategories=subcategories, pros=pros,
+            price_min=min(rates) if rates else 0,
+            price_max=max(rates) if rates else 0)
 
     return app

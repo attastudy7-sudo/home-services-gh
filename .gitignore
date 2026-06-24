@@ -7,3 +7,4 @@ instance/*.db
 static/uploads/
 .DS_Store
 *.swp
+.gstack/

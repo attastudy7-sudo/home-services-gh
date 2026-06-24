@@ -18,6 +18,12 @@
   <!-- NAV -->
   <nav class="gs-nav">
     <a href="{{ url_for('index') }}" class="gs-nav-logo">GhanaServe</a>
+    <div class="gc-nav-search">
+      <i class="ti ti-search" aria-hidden="true"></i>
+      <input type="search" id="gcDeskSearch" class="gc-nav-search-input"
+             placeholder="Search {{ category.name|lower }} pros…" autocomplete="off">
+      <button class="gc-nav-search-btn" type="button">Search</button>
+    </div>
     <div class="gs-nav-right">
       <a href="{{ url_for('auth.register_pro') }}" class="gs-btn-join">Join as a pro</a>
       <div class="gs-nav-icon" title="Cart">
@@ -64,101 +70,235 @@
     </div>
   </nav>
 
-  <!-- HERO BAND -->
-  <div class="gc-hero">
-    <div class="gc-hero-inner">
-      <div class="gc-breadcrumb">
-        <a href="{{ url_for('index') }}">Home</a>
-        <span>/</span>
-        <a href="{{ url_for('city_landing', city_slug=area.slug) }}">{{ area.area_name }}</a>
-        <span>/</span>
-        {{ category.name }}
+
+  <!-- Mobile header: search + breadcrumb (replaces hero strip on small screens) -->
+  <div class="gc-mob-header">
+    <div class="gc-mob-search-wrap">
+      <i class="ti ti-search" aria-hidden="true"></i>
+      <input type="search" id="gcMobSearch" class="gc-mob-search-input"
+             placeholder="Search {{ category.name|lower }} pros…" autocomplete="off">
+    </div>
+    <nav class="gc-mob-breadcrumb">
+      <a href="{{ url_for('index') }}">Home</a>
+      <span>›</span>
+      <a href="{{ url_for('city_landing', city_slug=area.slug) }}">{{ area.area_name }}</a>
+      <span>›</span>
+      <span>{{ category.name }}</span>
+    </nav>
+  </div>
+
+  <!-- LAYOUT: sidebar (desktop) + content -->
+  <div class="gc-layout{{ ' no-sidebar' if not subcategories }}">
+
+    <nav class="gc-breadcrumb">
+      <a href="{{ url_for('index') }}">Home</a>
+      <span>&gt;</span>
+      <a href="{{ url_for('city_landing', city_slug=area.slug) }}">{{ area.area_name }}</a>
+      <span>&gt;</span>
+      <span>{{ category.name }}</span>
+    </nav>
+
+    {% if subcategories %}
+    <!-- Desktop: filter sidebar (client-side filtering, no page reload) -->
+    <aside class="gc-sidebar">
+      <div class="gc-sidebar-section">
+        <div class="gc-sidebar-title">{{ category.name }}</div>
+        <button class="gc-sidebar-link active" data-filter="" type="button">All {{ category.name }}</button>
+        {% for sub in subcategories %}
+        <button class="gc-sidebar-link" data-filter="{{ sub.slug }}" type="button">{{ sub.name }}</button>
+        {% endfor %}
       </div>
-    </div>
-  </div>
 
-  <!-- SUBCATEGORY FILTER CHIPS -->
-  {% if subcategories %}
-  <div class="gc-filters">
-    <div class="gc-filters-inner">
-      <button class="gc-chip active" data-filter="all" type="button">All {{ category.name }}</button>
-      {% for sub in subcategories %}
-      <button class="gc-chip" data-filter="{{ sub.slug }}" type="button">{{ sub.name }}</button>
-      {% endfor %}
-    </div>
-  </div>
-  {% endif %}
-
-  <!-- PRO LISTINGS -->
-  <div class="gc-main">
-
-    {% if pros %}
-      {% for pro in pros %}
-      <a href="{{ url_for('pro.public_profile', slug=pro.slug) }}" class="gc-pro-card">
-
-        <!-- Avatar -->
-        <div class="gc-pro-avatar">
-          {{ (pro.business_name or pro.user.full_name)[:1].upper() }}
+      <div class="gc-sidebar-section">
+        <div class="gc-sidebar-section-header">
+          <div class="gc-sidebar-title">Price (GHS)</div>
+          <button class="gc-sidebar-apply" type="button">Apply</button>
         </div>
-
-        <!-- Body -->
-        <div class="gc-pro-body">
-          <div class="gc-pro-name">
-            {{ pro.business_name or pro.user.full_name }}
-            <span class="gc-pro-verified">
-              <i class="ti ti-shield-check"></i> Verified
-            </span>
+        <div class="gc-sidebar-price-body">
+          <div class="gc-price-slider">
+            <div class="gc-price-track">
+              <div class="gc-price-fill" id="gcPriceFill"></div>
+            </div>
+            <input type="range" class="gc-price-range gc-price-range-min"
+                   min="{{ price_min|int if price_min else 0 }}"
+                   max="{{ price_max|int if price_max else 500 }}"
+                   value="{{ price_min|int if price_min else 0 }}"
+                   aria-label="Minimum price">
+            <input type="range" class="gc-price-range gc-price-range-max"
+                   min="{{ price_min|int if price_min else 0 }}"
+                   max="{{ price_max|int if price_max else 500 }}"
+                   value="{{ price_max|int if price_max else 500 }}"
+                   aria-label="Maximum price">
           </div>
+          <div class="gc-sidebar-price">
+            <div class="gc-sidebar-price-group">
+              <input type="number" class="gc-filterprice-input gc-price-min"
+                     placeholder="{{ price_min|int if price_min else 0 }}" min="0">
+            </div>
+            <span class="gc-sidebar-price-sep">&ndash;</span>
+            <div class="gc-sidebar-price-group">
+              <input type="number" class="gc-filterprice-input gc-price-max"
+                     placeholder="{{ price_max|int if price_max else 0 }}" min="0">
+            </div>
+          </div>
+        </div>
+      </div>
 
-          <div class="gc-pro-rating">
-            <div class="gc-pro-stars">
-              {% for i in range(1, 6) %}
-                <i class="ti ti-star{% if i <= pro.avg_rating|round %}-filled{% endif %} gc-pro-star{% if i > pro.avg_rating|round %} empty{% endif %}"></i>
+      <div class="gc-sidebar-section">
+        <label class="gc-sidebar-checkbox">
+          <input type="checkbox" checked disabled>
+          Available now
+        </label>
+      </div>
+    </aside>
+    {% endif %}
+
+    <div class="gc-content">
+
+      <!-- Content header: title + count + sort -->
+      <div class="gc-content-header">
+        <div class="gc-content-title">
+          {{ category.name }}
+          <span class="gc-content-count" id="gcProCount">
+            ({{ pros|length }} pro{{ 's' if pros|length != 1 else '' }} found)
+          </span>
+        </div>
+        <div class="gc-content-sort">Sort by: <strong>Top rated</strong></div>
+      </div>
+
+      {% if subcategories %}
+      <!-- Mobile: dropdown filter bar (client-side, no page reload) -->
+      <div class="gc-filters">
+        <div class="gc-filterbar-mobile">
+          <div class="gc-filterbar-group">
+            <button class="gc-filterbtn" data-dropdown="category" type="button" aria-haspopup="true" aria-expanded="false">
+              <span data-label>{{ category.name }}</span>
+              <i class="ti ti-chevron-down" aria-hidden="true"></i>
+            </button>
+            <div class="gc-filterpanel" data-panel="category">
+              <div class="gc-sheet-header">{{ category.name }}</div>
+              <button class="gc-filteropt active" data-filter="" type="button">All {{ category.name }}</button>
+              {% for sub in subcategories %}
+              <button class="gc-filteropt" data-filter="{{ sub.slug }}" type="button">{{ sub.name }}</button>
               {% endfor %}
             </div>
-            <span class="gc-pro-rating-text">
-              {{ "%.1f"|format(pro.avg_rating) }} ({{ pro.total_reviews }} review{{ 's' if pro.total_reviews != 1 else '' }})
-              &middot; {{ pro.total_jobs }} job{{ 's' if pro.total_jobs != 1 else '' }} done
-            </span>
           </div>
 
-          <p class="gc-pro-bio">{{ pro.bio or 'Verified professional available in ' ~ area.area_name ~ '.' }}</p>
-
-          <div class="gc-pro-tags">
-            {% if pro.years_experience and pro.years_experience > 0 %}
-            <span class="gc-pro-tag">{{ pro.years_experience }} yr{{ 's' if pro.years_experience != 1 else '' }} experience</span>
-            {% endif %}
-            {% if pro.is_available %}
-            <span class="gc-pro-tag" style="background:#e8f5ef;color:#1A7A4A;">Available now</span>
-            {% endif %}
+          <div class="gc-filterbar-group">
+            <button class="gc-filterbtn" data-dropdown="price" type="button" aria-haspopup="true" aria-expanded="false">
+              <span data-label>Price</span>
+              <i class="ti ti-chevron-down" aria-hidden="true"></i>
+            </button>
+            <div class="gc-filterpanel gc-filterpanel-price" data-panel="price">
+              <div class="gc-sheet-header">Price (GHS)</div>
+              <label class="gc-filterprice-label">
+                Min (GHS)
+                <input type="number" class="gc-filterprice-input gc-mob-price-min"
+                       placeholder="{{ price_min|int if price_min else 0 }}" min="0">
+              </label>
+              <label class="gc-filterprice-label">
+                Max (GHS)
+                <input type="number" class="gc-filterprice-input gc-mob-price-max"
+                       placeholder="{{ price_max|int if price_max else 0 }}" min="0">
+              </label>
+              <button class="gc-filterprice-apply" id="gcMobPriceApply" type="button">Apply</button>
+            </div>
           </div>
+
+          <button class="gc-filterbtn gc-filterbtn-toggle active" type="button" style="cursor:default" title="All listed pros are available now">
+            <i class="ti ti-bolt" aria-hidden="true"></i> Available now
+          </button>
         </div>
-
-        <!-- CTA -->
-        <div class="gc-pro-cta">
-          {% if pro.base_hourly_rate %}
-          <div class="gc-pro-rate">
-            GHS {{ "%.0f"|format(pro.base_hourly_rate) }}
-            <span>per hour</span>
-          </div>
-          {% endif %}
-          <span class="gc-pro-btn">View profile</span>
-        </div>
-
-      </a>
-      {% endfor %}
-
-    {% else %}
-      <div class="gc-empty">
-        <div class="gc-empty-icon"><i class="ti ti-tools"></i></div>
-        <h2 class="gc-empty-title">No pros found in {{ area.area_name }} yet</h2>
-        <p class="gc-empty-body">
-          We don't have a verified {{ category.name|lower }} professional in this area yet.
-          Post a request and we'll match you as soon as one becomes available.
-        </p>
-        <a href="{{ url_for('customer.post_request') }}" class="gc-empty-btn">Post a request</a>
       </div>
-    {% endif %}
+      {% endif %}
+
+      <!-- Bottom sheet overlay (mobile) -->
+      <div id="gcSheetOverlay" class="gc-sheet-overlay"></div>
+
+      <!-- PRO LISTINGS -->
+      <div class="gc-main">
+
+        {% if pros %}
+          {% for pro in pros %}
+          <a href="{{ url_for('pro.public_profile', slug=pro.slug) }}" class="gc-pro-card"
+             data-subcats="{{ pro.subcat_slugs|join(',') }}"
+             data-rate="{{ pro.base_hourly_rate or '' }}"
+             data-available="{{ 'true' if pro.is_available else 'false' }}"
+             data-name="{{ (pro.business_name or pro.user.full_name)|lower }}">
+
+            <!-- Avatar -->
+            <div class="gc-pro-avatar">
+              {{ (pro.business_name or pro.user.full_name)[:1].upper() }}
+            </div>
+
+            <!-- Body -->
+            <div class="gc-pro-body">
+              <div class="gc-pro-name">
+                {{ pro.business_name or pro.user.full_name }}
+                <span class="gc-pro-verified">
+                  <i class="ti ti-shield-check"></i> Verified
+                </span>
+              </div>
+
+              <div class="gc-pro-rating">
+                <div class="gc-pro-stars">
+                  {% for i in range(1, 6) %}
+                    <i class="ti ti-star{% if i <= pro.avg_rating|round %}-filled{% endif %} gc-pro-star{% if i > pro.avg_rating|round %} empty{% endif %}"></i>
+                  {% endfor %}
+                </div>
+                <span class="gc-pro-rating-text">
+                  {{ "%.1f"|format(pro.avg_rating) }} ({{ pro.total_reviews }} review{{ 's' if pro.total_reviews != 1 else '' }})
+                  &middot; {{ pro.total_jobs }} job{{ 's' if pro.total_jobs != 1 else '' }} done
+                </span>
+              </div>
+
+              <p class="gc-pro-bio">{{ pro.bio or 'Verified professional available in ' ~ area.area_name ~ '.' }}</p>
+
+              <div class="gc-pro-tags">
+                {% if pro.years_experience and pro.years_experience > 0 %}
+                <span class="gc-pro-tag">{{ pro.years_experience }} yr{{ 's' if pro.years_experience != 1 else '' }} experience</span>
+                {% endif %}
+                {% if pro.is_available %}
+                <span class="gc-pro-tag" style="background:#e8f5ef;color:#1A7A4A;">Available now</span>
+                {% endif %}
+              </div>
+            </div>
+
+            <!-- CTA -->
+            <div class="gc-pro-cta">
+              {% if pro.base_hourly_rate %}
+              <div class="gc-pro-rate">
+                GHS {{ "%.0f"|format(pro.base_hourly_rate) }}
+                <span>per hour</span>
+              </div>
+              {% endif %}
+              <span class="gc-pro-btn">View profile</span>
+            </div>
+
+          </a>
+          {% endfor %}
+
+          <div class="gc-empty gc-empty-filtered" id="gcEmptyFiltered" hidden>
+            <div class="gc-empty-icon"><i class="ti ti-filter-off"></i></div>
+            <h2 class="gc-empty-title">No pros match these filters</h2>
+            <p class="gc-empty-body">Try a different subcategory, broaden the price range, or clear the search.</p>
+          </div>
+
+        {% else %}
+          <div class="gc-empty">
+            <div class="gc-empty-icon"><i class="ti ti-tools"></i></div>
+            <h2 class="gc-empty-title">No pros found in {{ area.area_name }} yet</h2>
+            <p class="gc-empty-body">
+              We don't have a verified {{ category.name|lower }} professional in this area yet.
+              Post a request and we'll match you as soon as one becomes available.
+            </p>
+            <a href="{{ url_for('customer.post_request') }}" class="gc-empty-btn">Post a request</a>
+          </div>
+        {% endif %}
+
+      </div>
+
+    </div>
 
   </div>
 
@@ -166,44 +306,213 @@
 
 <script>
 (function () {
-  document.querySelectorAll('.gc-chip').forEach(function (chip) {
-    chip.addEventListener('click', function () {
-      document.querySelectorAll('.gc-chip').forEach(function (c) {
-        c.classList.remove('active');
-      });
-      this.classList.add('active');
+  // ── Helpers ──────────────────────────────────────────────────────────────
+  function closeAllPanels() {
+    // Panels are hoisted to body — query from document
+    document.querySelectorAll('.gc-filterpanel').forEach(function (p) { p.classList.remove('open'); });
+    var bar = document.querySelector('.gc-filterbar-mobile');
+    if (bar) {
+      bar.querySelectorAll('.gc-filterbtn[data-dropdown]').forEach(function (b) { b.setAttribute('aria-expanded', 'false'); });
+    }
+    var ov = document.getElementById('gcSheetOverlay');
+    if (ov) ov.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  // ── Filter state ─────────────────────────────────────────────────────────
+  var cards = Array.prototype.slice.call(document.querySelectorAll('.gc-pro-card'));
+  var emptyEl = document.getElementById('gcEmptyFiltered');
+  var state = { sub: '', minPrice: null, maxPrice: null, query: '' };
+
+  function applyFilters() {
+    var visible = 0;
+    cards.forEach(function (card) {
+      var subcats = (card.dataset.subcats || '').split(',').filter(Boolean);
+      var rate    = card.dataset.rate ? parseFloat(card.dataset.rate) : null;
+      var name = card.dataset.name || '';
+    var ok = (!state.sub || subcats.indexOf(state.sub) !== -1)
+            && (state.minPrice === null || (rate !== null && rate >= state.minPrice))
+            && (state.maxPrice === null || (rate !== null && rate <= state.maxPrice))
+            && (!state.query || name.indexOf(state.query) !== -1);
+      card.style.display = ok ? '' : 'none';
+      if (ok) visible++;
+    });
+    if (emptyEl) emptyEl.hidden = visible !== 0;
+    var countEl = document.getElementById('gcProCount');
+    if (countEl) countEl.textContent = '(' + visible + ' pro' + (visible !== 1 ? 's' : '') + ' found)';
+
+    // Sync active class on every [data-filter] button (sidebar + mobile panel)
+    document.querySelectorAll('[data-filter]').forEach(function (el) {
+      el.classList.toggle('active', (el.dataset.filter || '') === state.sub);
+    });
+
+    // Mobile category pill label + highlight
+    var catBtn = document.querySelector('[data-dropdown="category"]');
+    if (catBtn) {
+      catBtn.classList.toggle('active', !!state.sub);
+      var lbl = catBtn.querySelector('[data-label]');
+      if (lbl) {
+        var opt = document.querySelector('.gc-filterpanel[data-panel="category"] [data-filter="' + state.sub + '"]');
+        lbl.textContent = state.sub && opt ? opt.textContent.trim() : '{{ category.name }}';
+      }
+    }
+
+    // Mobile price pill label + highlight
+    var priceBtn = document.querySelector('[data-dropdown="price"]');
+    if (priceBtn) {
+      var hasPrice = state.minPrice !== null || state.maxPrice !== null;
+      priceBtn.classList.toggle('active', hasPrice);
+      var pLbl = priceBtn.querySelector('[data-label]');
+      if (pLbl) {
+        pLbl.textContent = hasPrice
+          ? 'GHS ' + (state.minPrice || 0) + '–' + (state.maxPrice || '∞')
+          : 'Price';
+      }
+    }
+
+    // Update URL without a page reload (makes the URL shareable)
+    var url = new URL(window.location.href);
+    url.searchParams.delete('sub');
+    url.searchParams.delete('min_price');
+    url.searchParams.delete('max_price');
+    url.searchParams.delete('q');
+    if (state.sub)                  url.searchParams.set('sub', state.sub);
+    if (state.minPrice !== null)    url.searchParams.set('min_price', state.minPrice);
+    if (state.maxPrice !== null)    url.searchParams.set('max_price', state.maxPrice);
+    if (state.query)                url.searchParams.set('q', state.query);
+    history.replaceState(null, '', url.toString());
+  }
+
+  // ── Category (sidebar links + mobile panel options share [data-filter]) ──
+  document.querySelectorAll('[data-filter]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      state.sub = this.dataset.filter;
+      closeAllPanels();
+      applyFilters();
     });
   });
+
+  // ── Price — sidebar Apply ─────────────────────────────────────────────────
+  var sidebar = document.querySelector('.gc-sidebar');
+  if (sidebar) {
+    var sApply = sidebar.querySelector('.gc-sidebar-apply');
+    if (sApply) {
+      sApply.addEventListener('click', function () {
+        var minI = sidebar.querySelector('.gc-price-min');
+        var maxI = sidebar.querySelector('.gc-price-max');
+        state.minPrice = minI && minI.value ? parseFloat(minI.value) : null;
+        state.maxPrice = maxI && maxI.value ? parseFloat(maxI.value) : null;
+        applyFilters();
+      });
+    }
+  }
+
+  // ── Price — mobile Apply ──────────────────────────────────────────────────
+  var mobApply   = document.getElementById('gcMobPriceApply');
+  var pricePanel = document.querySelector('.gc-filterpanel-price');
+  if (mobApply && pricePanel) {
+    mobApply.addEventListener('click', function (e) {
+      e.stopPropagation();
+      state.minPrice = pricePanel.querySelector('.gc-mob-price-min').value
+        ? parseFloat(pricePanel.querySelector('.gc-mob-price-min').value) : null;
+      state.maxPrice = pricePanel.querySelector('.gc-mob-price-max').value
+        ? parseFloat(pricePanel.querySelector('.gc-mob-price-max').value) : null;
+      closeAllPanels();
+      applyFilters();
+    });
+  }
+
+  // ── Mobile bottom sheet open/close ────────────────────────────────────────
+  var mobileBar = document.querySelector('.gc-filterbar-mobile');
+  var sheetOverlay = document.getElementById('gcSheetOverlay');
+
+  // Hoist overlay + panels to <body> so no ancestor stacking context can trap them
+  if (sheetOverlay) document.body.appendChild(sheetOverlay);
+  if (mobileBar) {
+    mobileBar.querySelectorAll('.gc-filterpanel').forEach(function (panel) {
+      document.body.appendChild(panel);
+      panel.addEventListener('click', function (e) { e.stopPropagation(); });
+    });
+
+    mobileBar.querySelectorAll('.gc-filterbtn[data-dropdown]').forEach(function (btn) {
+      btn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        var panel = document.querySelector('.gc-filterpanel[data-panel="' + btn.dataset.dropdown + '"]');
+        var isOpen = panel.classList.contains('open');
+        closeAllPanels();
+        if (!isOpen) {
+          panel.classList.add('open');
+          btn.setAttribute('aria-expanded', 'true');
+          if (sheetOverlay) sheetOverlay.classList.add('open');
+          document.body.style.overflow = 'hidden';
+        }
+      });
+    });
+
+    if (sheetOverlay) {
+      sheetOverlay.addEventListener('click', closeAllPanels);
+    }
+  }
+
+  // ── Search (desktop nav + mobile header stay in sync) ────────────────────
+  var deskSearch = document.getElementById('gcDeskSearch');
+  var mobSearch  = document.getElementById('gcMobSearch');
+  function onSearch(val) {
+    state.query = val.trim().toLowerCase();
+    if (deskSearch && document.activeElement !== deskSearch) deskSearch.value = val;
+    if (mobSearch  && document.activeElement !== mobSearch)  mobSearch.value  = val;
+    applyFilters();
+  }
+  if (deskSearch) deskSearch.addEventListener('input', function () { onSearch(this.value); });
+  if (mobSearch)  mobSearch.addEventListener('input',  function () { onSearch(this.value); });
+
+  // ── Nav dropdown ──────────────────────────────────────────────────────────
   var t = document.querySelector('.gs-nav-dropdown-trigger');
   if (t) {
-    var b = t.querySelector('.gs-nav-icon');
-    var m = t.querySelector('.gs-nav-dropdown');
-    b.addEventListener('click', function(e) { e.stopPropagation(); m.classList.toggle('open'); });
-    document.addEventListener('click', function(e) { if (!t.contains(e.target)) m.classList.remove('open'); });
+    var nb = t.querySelector('.gs-nav-icon');
+    var nm = t.querySelector('.gs-nav-dropdown');
+    nb.addEventListener('click', function (e) { e.stopPropagation(); nm.classList.toggle('open'); });
+    document.addEventListener('click', function (e) { if (!t.contains(e.target)) nm.classList.remove('open'); });
   }
+})();
+
+// ── Price slider: range thumbs ↔ number inputs ────────────────────────────
+(function () {
+  var sidebar  = document.querySelector('.gc-sidebar');
+  if (!sidebar) return;
+  var rangeMin = sidebar.querySelector('.gc-price-range-min');
+  var rangeMax = sidebar.querySelector('.gc-price-range-max');
+  var fill     = document.getElementById('gcPriceFill');
+  var numMin   = sidebar.querySelector('.gc-price-min');
+  var numMax   = sidebar.querySelector('.gc-price-max');
+  if (!rangeMin || !rangeMax || !fill || !numMin || !numMax) return;
+
+  function syncFill() {
+    var lo = +rangeMin.value, hi = +rangeMax.value;
+    var mn = +rangeMin.min,   mx = +rangeMax.max;
+    if (mx === mn) { fill.style.left = '0%'; fill.style.width = '100%'; return; }
+    fill.style.left  = ((lo - mn) / (mx - mn) * 100) + '%';
+    fill.style.width = ((hi - lo) / (mx - mn) * 100) + '%';
+  }
+
+  rangeMin.addEventListener('input', function () {
+    if (+rangeMin.value > +rangeMax.value) rangeMin.value = rangeMax.value;
+    numMin.value = rangeMin.value; syncFill();
+  });
+  rangeMax.addEventListener('input', function () {
+    if (+rangeMax.value < +rangeMin.value) rangeMax.value = rangeMin.value;
+    numMax.value = rangeMax.value; syncFill();
+  });
+  numMin.addEventListener('change', function () {
+    var v = Math.max(+rangeMin.min, Math.min(+numMin.value || 0, +rangeMax.value));
+    numMin.value = v; rangeMin.value = v; syncFill();
+  });
+  numMax.addEventListener('change', function () {
+    var v = Math.min(+rangeMax.max, Math.max(+numMax.value || +rangeMax.max, +rangeMin.value));
+    numMax.value = v; rangeMax.value = v; syncFill();
+  });
+  syncFill();
 })();
 </script>
 {% endblock %}
 
-{% block footer %}
-<footer class="gs-footer-bar">
-  <div class="gs-footer-inner">
-    <div class="gs-footer-left">
-      <span style="font-weight:700;font-size:1.1rem;color:#111">GhanaServe</span>
-      <span class="gs-footer-copy">© GhanaServe Ltd. 2026</span>
-    </div>
-    <div class="gs-footer-links">
-      <a href="{{ url_for('pages.terms') }}">Terms of Service</a>
-      <a href="{{ url_for('pages.privacy') }}">Privacy Policy</a>
-      <a href="{{ url_for('pages.contact') }}">Contact</a>
-    </div>
-    <div class="gs-footer-right">
-      <a href="#" class="gs-footer-icon" aria-label="TikTok"><i class="ti ti-brand-tiktok" aria-hidden="true"></i></a>
-      <a href="#" class="gs-footer-icon" aria-label="Instagram"><i class="ti ti-brand-instagram" aria-hidden="true"></i></a>
-      <a href="#" class="gs-footer-icon" aria-label="LinkedIn"><i class="ti ti-brand-linkedin" aria-hidden="true"></i></a>
-      <a href="#" class="gs-footer-icon" aria-label="Facebook"><i class="ti ti-brand-facebook" aria-hidden="true"></i></a>
-      <a href="#" class="gs-footer-icon" aria-label="X / Twitter"><i class="ti ti-brand-x" aria-hidden="true"></i></a>
-    </div>
-  </div>
-</footer>
-{% endblock %}

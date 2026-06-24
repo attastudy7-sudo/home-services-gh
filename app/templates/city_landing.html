@@ -18,6 +18,12 @@
   <!-- NAV -->
   <nav class="gs-nav">
     <a href="{{ url_for('index') }}" class="gs-nav-logo">GhanaServe</a>
+    <div class="gc-nav-search">
+      <i class="ti ti-search" aria-hidden="true"></i>
+      <input type="search" id="gcCitySearch" class="gc-nav-search-input"
+             placeholder="Search services in {{ area.area_name }}…" autocomplete="off">
+      <button class="gc-nav-search-btn" type="button">Search</button>
+    </div>
     <div class="gs-nav-right">
       <a href="{{ url_for('auth.register_pro') }}" class="gs-btn-join">Join as a pro</a>
       <div class="gs-nav-icon" title="Cart">
@@ -64,24 +70,19 @@
     </div>
   </nav>
 
-  <!-- HERO BAND -->
-  <div class="gc-hero">
-    <div class="gc-hero-inner">
-      <div class="gc-breadcrumb">
-        <a href="{{ url_for('index') }}">Home</a>
-        <span>/</span>
-        {{ area.area_name }}
-      </div>
-    </div>
-  </div>
-
   <!-- CATEGORY GRID -->
-  <div class="gc-main">
+  <div class="gc-city-page">
+    <nav class="gc-breadcrumb">
+      <a href="{{ url_for('index') }}">Home</a>
+      <span>&gt;</span>
+      <span>{{ area.area_name }}</span>
+    </nav>
     <div class="gc-cat-grid">
       {% for cat in categories %}
       <a href="{{ url_for('category_in_city', city_slug=area.slug, category_slug=cat.slug) }}"
          class="gc-cat-card"
-         data-slug="{{ cat.slug }}">
+         data-slug="{{ cat.slug }}"
+         data-name="{{ cat.name|lower }}">
         <div class="gc-cat-icon">
           {% if cat.slug == 'plumbing' %}
             <i class="ti ti-droplet"></i>
@@ -120,7 +121,7 @@
     </div>
   </div>
 
-</div>
+</div><!-- /.gc-page -->
 
 <script>
 (function() {
@@ -131,29 +132,17 @@
     b.addEventListener('click', function(e) { e.stopPropagation(); m.classList.toggle('open'); });
     document.addEventListener('click', function(e) { if (!t.contains(e.target)) m.classList.remove('open'); });
   }
+
+  var citySearch = document.getElementById('gcCitySearch');
+  if (citySearch) {
+    citySearch.addEventListener('input', function() {
+      var q = this.value.trim().toLowerCase();
+      document.querySelectorAll('.gc-cat-card').forEach(function(card) {
+        card.style.display = (!q || card.dataset.name.indexOf(q) !== -1) ? '' : 'none';
+      });
+    });
+  }
 })();
 </script>
 {% endblock %}
 
-{% block footer %}
-<footer class="gs-footer-bar">
-  <div class="gs-footer-inner">
-    <div class="gs-footer-left">
-      <span style="font-weight:700;font-size:1.1rem;color:#111">GhanaServe</span>
-      <span class="gs-footer-copy">&copy; GhanaServe Ltd. 2026</span>
-    </div>
-    <div class="gs-footer-links">
-      <a href="{{ url_for('pages.terms') }}">Terms of Service</a>
-      <a href="{{ url_for('pages.privacy') }}">Privacy Policy</a>
-      <a href="{{ url_for('pages.contact') }}">Contact</a>
-    </div>
-    <div class="gs-footer-right">
-      <a href="#" class="gs-footer-icon" aria-label="TikTok"><i class="ti ti-brand-tiktok" aria-hidden="true"></i></a>
-      <a href="#" class="gs-footer-icon" aria-label="Instagram"><i class="ti ti-brand-instagram" aria-hidden="true"></i></a>
-      <a href="#" class="gs-footer-icon" aria-label="LinkedIn"><i class="ti ti-brand-linkedin" aria-hidden="true"></i></a>
-      <a href="#" class="gs-footer-icon" aria-label="Facebook"><i class="ti ti-brand-facebook" aria-hidden="true"></i></a>
-      <a href="#" class="gs-footer-icon" aria-label="X / Twitter"><i class="ti ti-brand-x" aria-hidden="true"></i></a>
-    </div>
-  </div>
-</footer>
-{% endblock %}

@@ -32,8 +32,12 @@
     function maybeNavigate() {
       if (selectedAreaSlug && selectedCatSlug) {
         window.location.href = '/' + selectedAreaSlug + '/' + selectedCatSlug;
-      } else if (selectedAreaSlug) {
-        window.location.href = '/' + selectedAreaSlug;
+      } else if (selectedAreaSlug && !selectedCatSlug) {
+        showModal('service-modal-overlay');
+        $('service-search-input').focus();
+      } else if (selectedCatSlug && !selectedAreaSlug) {
+        showModal('area-modal-overlay');
+        $('area-search-input').focus();
       }
     }
 
