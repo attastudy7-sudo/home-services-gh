@@ -1,18 +1,74 @@
 {% extends "base.html" %}
 {% block title %}User Detail — Admin{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.30.0/dist/tabler-icons.min.css">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+{% endblock %}
+
 {% block content %}
-<h1>User: {{ user.full_name }}</h1>
-<p>Email: {{ user.email }} &mdash; Phone: {{ user.phone }}</p>
-<p>Role: {{ user.role }} &mdash; Active: {{ user.is_active }} &mdash; Verified: {{ user.is_verified }}</p>
-<p>Pro profile: {{ 'Yes' if user.pro_profile else 'No' }}</p>
-{% if user.is_active %}
-  <form method="POST" action="{{ url_for('admin.suspend_user', user_id=user.id) }}">
-    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-    <input type="text" name="note" placeholder="Reason for suspension">
-    <button type="submit" onclick="return confirm('Suspend this user?')">Suspend user</button>
-  </form>
-{% else %}
-  <p>This user is suspended.</p>
-{% endif %}
-<p><a href="{{ url_for('admin.list_users') }}">&larr; Back to users</a></p>
+<div class="ad-page">
+
+  <div class="ad-breadcrumb">
+    <a href="{{ url_for('admin.dashboard') }}">Dashboard</a> &rsaquo;
+    <a href="{{ url_for('admin.list_users') }}">Users</a> &rsaquo;
+    {{ user.full_name }}
+  </div>
+
+  <div class="ad-header">
+    <h1>{{ user.full_name }}</h1>
+  </div>
+
+  <div class="ad-detail">
+    <div class="ad-detail-grid">
+      <div class="ad-detail-field">
+        <div class="ad-detail-label">Email</div>
+        <div class="ad-detail-value">{{ user.email }}</div>
+      </div>
+      <div class="ad-detail-field">
+        <div class="ad-detail-label">Phone</div>
+        <div class="ad-detail-value">{{ user.phone or '—' }}</div>
+      </div>
+      <div class="ad-detail-field">
+        <div class="ad-detail-label">Role</div>
+        <div class="ad-detail-value">{{ user.role }}</div>
+      </div>
+      <div class="ad-detail-field">
+        <div class="ad-detail-label">Status</div>
+        <div class="ad-detail-value">
+          <span class="ad-badge ad-badge--{{ 'active' if user.is_active else 'inactive' }}">
+            <i class="ti ti-{{ 'circle-check' if user.is_active else 'circle-x' }}"></i>
+            {{ 'Active' if user.is_active else 'Suspended' }}
+          </span>
+        </div>
+      </div>
+      <div class="ad-detail-field">
+        <div class="ad-detail-label">Verified</div>
+        <div class="ad-detail-value">{{ 'Yes' if user.is_verified else 'No' }}</div>
+      </div>
+      <div class="ad-detail-field">
+        <div class="ad-detail-label">Pro profile</div>
+        <div class="ad-detail-value">{{ 'Yes' if user.pro_profile else 'No' }}</div>
+      </div>
+    </div>
+
+    {% if user.is_active %}
+    <div class="ad-detail-actions">
+      <form method="POST" action="{{ url_for('admin.suspend_user', user_id=user.id) }}" style="display:inline" onsubmit="return confirm('Suspend this user?')">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input type="text" name="note" class="ad-form-input" placeholder="Reason for suspension" style="width:auto;display:inline-block;margin-right:8px;padding:6px 12px;font-size:13px;">
+        <button type="submit" class="ad-btn ad-btn-sm ad-btn-danger"><i class="ti ti-ban"></i> Suspend user</button>
+      </form>
+    </div>
+    {% else %}
+    <div class="ad-detail-actions">
+      <p style="font-size:13px;color:#6b7280;margin:0;">This user is suspended.</p>
+    </div>
+    {% endif %}
+  </div>
+
+  <p style="margin-top:20px;">
+    <a href="{{ url_for('admin.list_users') }}" class="ad-btn ad-btn-outline">&larr; Back to users</a>
+  </p>
+
+</div>
 {% endblock %}

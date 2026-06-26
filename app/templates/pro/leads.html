@@ -1,17 +1,51 @@
 {% extends "base.html" %}
 {% block title %}Available Leads — GhanaServe{% endblock %}
+{% block extra_css %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/portal.css') }}">
+{% endblock %}
 {% block content %}
-<h1>Available leads in your service areas</h1>
-{% if leads %}
-  {% for req in leads %}
-    <div>
-      <h3><a href="{{ url_for('pro.view_lead', request_id=req.id) }}">{{ req.title }}</a></h3>
-      <p>Category: {{ req.category.name }} &mdash; Budget: GH&#8373; {{ req.budget_min or '?' }}–{{ req.budget_max or '?' }} &mdash; {{ 'URGENT' if req.is_urgent else '' }}</p>
-      <p>Posted: {{ req.created_at.strftime('%d %b %Y') }}</p>
+<div class="gd-page">
+  <div class="gd-page-header">
+    <div class="gd-page-title">Available Leads</div>
+    <div class="gd-page-sub">Open requests in your service areas</div>
+  </div>
+
+  {% if leads %}
+    {% for req in leads %}
+    <div class="gd-card">
+      <div class="gd-card-header">
+        <a href="{{ url_for('pro.view_lead', request_id=req.id) }}" class="gd-link" style="font-size:1rem;font-weight:600;color:#1A1A2E;">{{ req.title }}</a>
+        <div style="display:flex;gap:0.4rem;">
+          {% if req.is_urgent %}<span class="gd-badge gd-badge--red">Urgent</span>{% endif %}
+          <span class="gd-badge gd-badge--gray">{{ req.category.name }}</span>
+        </div>
+      </div>
+      {% if req.budget_min or req.budget_max %}
+      <div class="gd-detail-row">
+        <span class="gd-detail-key">Budget</span>
+        <span class="gd-detail-val">GH&#8373; {{ req.budget_min or '?' }} – {{ req.budget_max or '?' }}</span>
+      </div>
+      {% endif %}
+      <div class="gd-detail-row">
+        <span class="gd-detail-key">Posted</span>
+        <span class="gd-detail-val">{{ req.created_at.strftime('%d %b %Y') }}</span>
+      </div>
+      <div class="gd-actions" style="margin-top:0.75rem;">
+        <a href="{{ url_for('pro.view_lead', request_id=req.id) }}" class="gd-btn gd-btn--sm">View &amp; quote</a>
+      </div>
     </div>
-    <hr>
-  {% endfor %}
-{% else %}
-  <p>No open leads in your service areas right now. Check back soon.</p>
-{% endif %}
+    {% endfor %}
+  {% else %}
+  <div class="gd-card">
+    <div class="gd-empty">
+      <div class="gd-empty-icon"><i class="ti ti-map-search"></i></div>
+      <p>No open leads right now</p>
+      <div class="gd-empty-sub">Check back soon or add more service areas to see more requests</div>
+      <a href="{{ url_for('pro.edit_profile') }}" class="gd-btn">Manage service areas</a>
+    </div>
+  </div>
+  {% endif %}
+</div>
 {% endblock %}

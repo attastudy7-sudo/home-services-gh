@@ -1,17 +1,60 @@
 {% extends "base.html" %}
 {% block title %}All Payments — Admin{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.30.0/dist/tabler-icons.min.css">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+{% endblock %}
+
 {% block content %}
-<h1>All payments</h1>
-{% for payment in payments %}
-  <div>
-    <p>GH&#8373; {{ payment.amount }} &mdash; {{ payment.gateway }} &mdash; Status: {{ payment.status }} &mdash; MoMo: {{ payment.momo_network or '—' }} &mdash; {{ payment.initiated_at.strftime('%d %b %Y %H:%M') }}</p>
+<div class="ad-page">
+
+  <div class="ad-breadcrumb">
+    <a href="{{ url_for('admin.dashboard') }}">Dashboard</a> &rsaquo; Payments
   </div>
-{% endfor %}
-{% if pagination.pages > 1 %}
-  <p>
-    {% if pagination.has_prev %}<a href="{{ url_for('admin.list_payments', page=pagination.prev_num) }}">&larr; Previous</a> {% endif %}
-    Page {{ pagination.page }} of {{ pagination.pages }}
-    {% if pagination.has_next %} <a href="{{ url_for('admin.list_payments', page=pagination.next_num) }}">Next &rarr;</a>{% endif %}
-  </p>
-{% endif %}
+
+  <div class="ad-header">
+    <div>
+      <h1>All payments</h1>
+      <div class="ad-header-sub">{{ pagination.total }} transactions</div>
+    </div>
+  </div>
+
+  <div class="ad-table-wrap">
+    <table class="ad-table">
+      <thead>
+        <tr>
+          <th>Amount</th>
+          <th>Gateway</th>
+          <th>MoMo</th>
+          <th>Status</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for payment in payments %}
+        <tr>
+          <td style="font-weight:600;">GH&#8373; {{ payment.amount }}</td>
+          <td>{{ payment.gateway }}</td>
+          <td>{{ payment.momo_network or '—' }} {{ '(' + payment.payer_momo_number + ')' if payment.payer_momo_number else '' }}</td>
+          <td><span class="ad-badge ad-badge--{{ payment.status }}">{{ payment.status }}</span></td>
+          <td style="color:#6b7280;">{{ payment.initiated_at.strftime('%d %b %Y %H:%M') }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    {% if pagination.pages > 1 %}
+    <div class="ad-pagination">
+      {% if pagination.has_prev %}
+        <a href="{{ url_for('admin.list_payments', page=pagination.prev_num) }}"><i class="ti ti-chevron-left"></i> Previous</a>
+      {% endif %}
+      <span>Page {{ pagination.page }} of {{ pagination.pages }}</span>
+      {% if pagination.has_next %}
+        <a href="{{ url_for('admin.list_payments', page=pagination.next_num) }}">Next <i class="ti ti-chevron-right"></i></a>
+      {% endif %}
+    </div>
+    {% endif %}
+  </div>
+
+</div>
 {% endblock %}

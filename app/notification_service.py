@@ -55,14 +55,9 @@ def notify_booking_confirmed(customer_user_id, booking_id, request_title):
 
 
 def notify_booking_completed(customer_user_id, booking_id, pro_business_name):
-    """
-    Notifies the customer that their booking has been marked as complete.
-    Uses type='booking_confirmed' as the closest available type until a
-    'booking_completed' value is added to the CheckConstraint in a future migration.
-    """
     return create_notification(
         user_id=customer_user_id,
-        type='booking_confirmed',
+        type='booking_completed',
         title='Job completed',
         body=f'{pro_business_name} marked your job as complete. Leave a review!',
         action_url=f'/customer/bookings/{booking_id}/review',
@@ -72,14 +67,9 @@ def notify_booking_completed(customer_user_id, booking_id, pro_business_name):
 
 
 def notify_pro_rejected(pro_user_id):
-    """
-    Notifies a pro that their profile was not approved.
-    Uses type='pro_approved' as the closest available type until 'pro_rejected'
-    is added to the CheckConstraint in a future migration.
-    """
     return create_notification(
         user_id=pro_user_id,
-        type='pro_approved',
+        type='pro_rejected',
         title='Profile not approved',
         body='Your professional profile was not approved. Contact support for details.',
         action_url='/pro/profile/edit',

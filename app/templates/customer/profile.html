@@ -1,13 +1,49 @@
 {% extends "base.html" %}
 {% block title %}My Profile — GhanaServe{% endblock %}
+{% block extra_css %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/portal.css') }}">
+{% endblock %}
 {% block content %}
-<h1>My profile</h1>
-<p>Name: {{ current_user.full_name }}</p>
-<p>Email: {{ current_user.email }}</p>
-<p>Phone: {{ current_user.phone }}</p>
-<p>Account type: {{ 'Pro + Customer' if current_user.is_pro else 'Customer' }}</p>
-<p><a href="{{ url_for('customer.edit_profile') }}">Edit profile</a></p>
-{% if not current_user.is_pro %}
-  <p><a href="{{ url_for('auth.register_pro') }}">Apply to become a Pro</a></p>
-{% endif %}
+<div class="gd-page">
+  <div class="gd-page-header">
+    <div class="gd-page-title">My Profile</div>
+    <a href="{{ url_for('customer.edit_profile') }}" class="gd-btn gd-btn--ghost"><i class="ti ti-pencil"></i> Edit profile</a>
+  </div>
+
+  <div class="gd-card">
+    <div class="gd-card-header">
+      Account details
+      <div style="display:flex;gap:0.4rem;">
+        <span class="gd-badge {{ 'gd-badge--blue' if current_user.is_pro else 'gd-badge--gray' }}">
+          {{ 'Pro + Customer' if current_user.is_pro else 'Customer' }}
+        </span>
+        <span class="gd-badge {{ 'gd-badge--green' if current_user.is_verified else 'gd-badge--yellow' }}">
+          {{ 'Verified' if current_user.is_verified else 'Email unverified' }}
+        </span>
+      </div>
+    </div>
+    <div class="gd-detail-row">
+      <span class="gd-detail-key">Full name</span>
+      <span class="gd-detail-val">{{ current_user.full_name }}</span>
+    </div>
+    <div class="gd-detail-row">
+      <span class="gd-detail-key">Email</span>
+      <span class="gd-detail-val">{{ current_user.email }}</span>
+    </div>
+    <div class="gd-detail-row">
+      <span class="gd-detail-key">Phone</span>
+      <span class="gd-detail-val">{{ current_user.phone or 'Not set' }}</span>
+    </div>
+  </div>
+
+  {% if not current_user.is_pro %}
+  <div class="gd-card" style="border-color:#A7F3D0;background:#F0FDF4;">
+    <div class="gd-card-header" style="color:#065F46;">Earn more with GhanaServe</div>
+    <p style="font-size:0.9rem;color:#374151;margin-bottom:1rem;">Join as a professional and start receiving paid service requests in your area.</p>
+    <a href="{{ url_for('auth.become_pro') }}" class="gd-btn">Apply to become a Pro</a>
+  </div>
+  {% endif %}
+</div>
 {% endblock %}

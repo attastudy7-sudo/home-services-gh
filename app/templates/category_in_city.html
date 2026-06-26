@@ -1,13 +1,13 @@
 {% extends "base.html" %}
 
-{% block title %}{{ category.name }} in {{ area.area_name }} — GhanaServe{% endblock %}
+{% block title %}{{ category.name }} in {{ area.area_name if area else city_name }} — GhanaServe{% endblock %}
 
 {% block nav %}{% endblock %}
+{% block nav_sub %}{% endblock %}
 
 {% block extra_css %}
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.24.0/dist/tabler-icons.min.css">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/category.css') }}">
 {% endblock %}
@@ -25,14 +25,23 @@
       <button class="gc-nav-search-btn" type="button">Search</button>
     </div>
     <div class="gs-nav-right">
-      <a href="{{ url_for('auth.register_pro') }}" class="gs-btn-join">Join as a pro</a>
+      {% if not current_user.is_authenticated or (not current_user.is_pro and not current_user.is_admin) %}
+      <a href="{{ url_for('auth.become_pro' if current_user.is_authenticated else 'auth.register_pro') }}" class="gs-btn-join">Join as a pro</a>
+      {% endif %}
       <div class="gs-nav-icon" title="Cart">
         <i class="ti ti-shopping-cart" aria-hidden="true"></i>
       </div>
       <div class="gs-nav-dropdown-trigger">
+        {% if current_user.is_authenticated %}
+        <button class="gs-nav-account-btn" aria-haspopup="true" aria-expanded="false">
+          <span class="gs-nav-avatar">{{ current_user.full_name[:1] }}</span>
+          {{ current_user.full_name.split()[0] }} <i class="ti ti-chevron-down"></i>
+        </button>
+        {% else %}
         <button class="gs-nav-icon" title="Account" aria-haspopup="true" aria-expanded="false">
           <i class="ti ti-user" aria-hidden="true"></i>
         </button>
+        {% endif %}
         <div class="gs-nav-dropdown" role="menu">
           {% if current_user.is_authenticated %}
             {% if current_user.is_admin %}
@@ -70,6 +79,7 @@
     </div>
   </nav>
 
+  {% include "_nav_sub.html" %}
 
   <!-- Mobile header: search + breadcrumb (replaces hero strip on small screens) -->
   <div class="gc-mob-header">
@@ -81,7 +91,7 @@
     <nav class="gc-mob-breadcrumb">
       <a href="{{ url_for('index') }}">Home</a>
       <span>›</span>
-      <a href="{{ url_for('city_landing', city_slug=area.slug) }}">{{ area.area_name }}</a>
+      <a href="{{ url_for('city_landing', city_slug=area.slug if area else city_name|lower) }}">{{ area.area_name if area else city_name }}</a>
       <span>›</span>
       <span>{{ category.name }}</span>
     </nav>
@@ -93,7 +103,7 @@
     <nav class="gc-breadcrumb">
       <a href="{{ url_for('index') }}">Home</a>
       <span>&gt;</span>
-      <a href="{{ url_for('city_landing', city_slug=area.slug) }}">{{ area.area_name }}</a>
+      <a href="{{ url_for('city_landing', city_slug=area.slug if area else city_name|lower) }}">{{ area.area_name if area else city_name }}</a>
       <span>&gt;</span>
       <span>{{ category.name }}</span>
     </nav>
@@ -154,18 +164,6 @@
     {% endif %}
 
     <div class="gc-content">
-
-      <!-- Content header: title + count + sort -->
-      <div class="gc-content-header">
-        <div class="gc-content-title">
-          {{ category.name }}
-          <span class="gc-content-count" id="gcProCount">
-            ({{ pros|length }} pro{{ 's' if pros|length != 1 else '' }} found)
-          </span>
-        </div>
-        <div class="gc-content-sort">Sort by: <strong>Top rated</strong></div>
-      </div>
-
       {% if subcategories %}
       <!-- Mobile: dropdown filter bar (client-side, no page reload) -->
       <div class="gc-filters">
@@ -252,7 +250,7 @@
                 </span>
               </div>
 
-              <p class="gc-pro-bio">{{ pro.bio or 'Verified professional available in ' ~ area.area_name ~ '.' }}</p>
+              <p class="gc-pro-bio">{{ pro.bio or 'Verified professional available in ' ~ (area.area_name if area else city_name) ~ '.' }}</p>
 
               <div class="gc-pro-tags">
                 {% if pro.years_experience and pro.years_experience > 0 %}
@@ -287,7 +285,7 @@
         {% else %}
           <div class="gc-empty">
             <div class="gc-empty-icon"><i class="ti ti-tools"></i></div>
-            <h2 class="gc-empty-title">No pros found in {{ area.area_name }} yet</h2>
+            <h2 class="gc-empty-title">No pros found in {{ area.area_name if area else city_name }} yet</h2>
             <p class="gc-empty-body">
               We don't have a verified {{ category.name|lower }} professional in this area yet.
               Post a request and we'll match you as soon as one becomes available.
@@ -469,11 +467,22 @@
   // ── Nav dropdown ──────────────────────────────────────────────────────────
   var t = document.querySelector('.gs-nav-dropdown-trigger');
   if (t) {
-    var nb = t.querySelector('.gs-nav-icon');
+    var nb = t.querySelector('.gs-nav-icon, .gs-nav-account-btn');
     var nm = t.querySelector('.gs-nav-dropdown');
     nb.addEventListener('click', function (e) { e.stopPropagation(); nm.classList.toggle('open'); });
     document.addEventListener('click', function (e) { if (!t.contains(e.target)) nm.classList.remove('open'); });
   }
+})();
+
+// ── Filter bar shadow on scroll (mobile) ─────────────────────────────────
+(function () {
+  var filters = document.querySelector('.gc-filters');
+  if (!filters) return;
+  var checkStuck = function () {
+    filters.classList.toggle('gc-filters-stuck', filters.getBoundingClientRect().top <= 72);
+  };
+  window.addEventListener('scroll', checkStuck, {passive: true});
+  checkStuck();
 })();
 
 // ── Price slider: range thumbs ↔ number inputs ────────────────────────────

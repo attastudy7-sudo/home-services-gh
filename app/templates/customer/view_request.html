@@ -1,16 +1,56 @@
 {% extends "base.html" %}
 {% block title %}{{ req.title }} — GhanaServe{% endblock %}
+{% block extra_css %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/portal.css') }}">
+{% endblock %}
 {% block content %}
-<h1>{{ req.title }}</h1>
-<p>Status: <strong>{{ req.status }}</strong></p>
-<p>{{ req.description }}</p>
-<p>Quotes received: {{ req.quote_count }}</p>
-{% if req.status == 'open' %}
-  <p><a href="{{ url_for('customer.view_quotes', request_id=req.id) }}">View quotes</a></p>
-  <form method="POST" action="{{ url_for('customer.cancel_request', request_id=req.id) }}">
-    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-    <button type="submit" onclick="return confirm('Cancel this request?')">Cancel request</button>
-  </form>
-{% endif %}
-<p><a href="{{ url_for('customer.my_requests') }}">&larr; Back to my requests</a></p>
+<div class="gd-page">
+  <div class="gd-page-header">
+    <div>
+      <div class="gd-page-title">{{ req.title }}</div>
+      <div style="margin-top:0.4rem;">
+        <span class="gd-badge {% if req.status == 'open' %}gd-badge--green{% elif req.status in ('cancelled','expired') %}gd-badge--red{% elif req.status == 'matched' %}gd-badge--blue{% else %}gd-badge--gray{% endif %}">
+          {{ req.status | replace('_', ' ') | title }}
+        </span>
+        {% if req.is_urgent %}
+          <span class="gd-badge gd-badge--red" style="margin-left:0.3rem;">Urgent</span>
+        {% endif %}
+      </div>
+    </div>
+    <a href="{{ url_for('customer.my_requests') }}" class="gd-link">&larr; Back</a>
+  </div>
+
+  <div class="gd-card">
+    <div class="gd-card-header">Request details</div>
+    <p style="font-size:0.9rem;line-height:1.7;color:#374151;margin-bottom:1rem;">{{ req.description }}</p>
+    {% if req.budget_min or req.budget_max %}
+    <div class="gd-detail-row">
+      <span class="gd-detail-key">Budget</span>
+      <span class="gd-detail-val">GH&#8373; {{ req.budget_min or '?' }} – {{ req.budget_max or '?' }}</span>
+    </div>
+    {% endif %}
+    {% if req.preferred_date %}
+    <div class="gd-detail-row">
+      <span class="gd-detail-key">Preferred date</span>
+      <span class="gd-detail-val">{{ req.preferred_date.strftime('%d %b %Y') }}{% if req.preferred_time_slot %} ({{ req.preferred_time_slot | title }}){% endif %}</span>
+    </div>
+    {% endif %}
+    <div class="gd-detail-row">
+      <span class="gd-detail-key">Quotes received</span>
+      <span class="gd-detail-val">{{ req.quote_count }}</span>
+    </div>
+  </div>
+
+  {% if req.status == 'open' %}
+  <div class="gd-actions">
+    <a href="{{ url_for('customer.view_quotes', request_id=req.id) }}" class="gd-btn">View quotes ({{ req.quote_count }})</a>
+    <form method="POST" action="{{ url_for('customer.cancel_request', request_id=req.id) }}" style="display:inline;">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <button type="submit" class="gd-link" style="border:none;background:none;cursor:pointer;color:#DC2626;" onclick="return confirm('Cancel this request?')">Cancel request</button>
+    </form>
+  </div>
+  {% endif %}
+</div>
 {% endblock %}

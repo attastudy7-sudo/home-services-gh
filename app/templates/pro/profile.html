@@ -1,15 +1,56 @@
 {% extends "base.html" %}
 {% block title %}Pro Profile — GhanaServe{% endblock %}
+{% block extra_css %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/portal.css') }}">
+{% endblock %}
 {% block content %}
-<h1>My pro profile</h1>
-<p>Business: {{ pro.business_name }}</p>
-<p>Status: {{ pro.verification_status }}</p>
-<p>Rating: {{ pro.avg_rating }}/5 ({{ pro.total_reviews }} reviews)</p>
-<p>Jobs completed: {{ pro.total_jobs }}</p>
-<p>Bio: {{ pro.bio or 'Not set' }}</p>
-<p>Years experience: {{ pro.years_experience }}</p>
-<p>Base hourly rate: GH&#8373; {{ pro.base_hourly_rate or 'Not set' }}</p>
-<p>Availability: {{ pro.availability_note or 'Not set' }}</p>
-<p><a href="{{ url_for('pro.edit_profile') }}">Edit profile</a></p>
-<p><a href="{{ url_for('pro.public_profile', slug=pro.slug) }}">View public profile</a></p>
+<div class="gd-page">
+  <div class="gd-page-header">
+    <div class="gd-page-title">My Pro Profile</div>
+    <div class="gd-actions" style="margin-top:0;">
+      <a href="{{ url_for('pro.edit_profile') }}" class="gd-btn gd-btn--ghost"><i class="ti ti-pencil"></i> Edit</a>
+      <a href="{{ url_for('pro.public_profile', slug=pro.slug) }}" class="gd-btn gd-btn--ghost"><i class="ti ti-eye"></i> Public view</a>
+    </div>
+  </div>
+  <div class="gd-card">
+    <div class="gd-card-header">
+      {{ pro.business_name or current_user.full_name }}
+      <span class="gd-badge {% if pro.verification_status == 'approved' %}gd-badge--green{% elif pro.verification_status == 'pending' %}gd-badge--yellow{% else %}gd-badge--red{% endif %}">
+        {{ pro.verification_status | title }}
+      </span>
+    </div>
+    <div style="margin-bottom:0.75rem;">
+      <span class="gd-stars">{% for i in range(pro.avg_rating | int) %}&#9733;{% endfor %}{% for i in range(5 - (pro.avg_rating | int)) %}&#9734;{% endfor %}</span>
+      <span style="font-size:0.8rem;color:#6B7280;margin-left:0.3rem;">{{ "%.1f" | format(pro.avg_rating) }} ({{ pro.total_reviews }} reviews) &middot; {{ pro.total_jobs }} jobs</span>
+    </div>
+    <div class="gd-detail-row">
+      <span class="gd-detail-key">Bio</span>
+      <span class="gd-detail-val">{{ pro.bio or 'Not set' }}</span>
+    </div>
+    <div class="gd-detail-row">
+      <span class="gd-detail-key">Experience</span>
+      <span class="gd-detail-val">{{ pro.years_experience or 0 }} year(s)</span>
+    </div>
+    <div class="gd-detail-row">
+      <span class="gd-detail-key">Hourly rate</span>
+      <span class="gd-detail-val">{{ 'GH&#8373; ' + pro.base_hourly_rate | string if pro.base_hourly_rate else 'Not set' }}</span>
+    </div>
+    <div class="gd-detail-row">
+      <span class="gd-detail-key">Availability</span>
+      <span class="gd-detail-val">{{ pro.availability_note or 'Not set' }}</span>
+    </div>
+    <div class="gd-detail-row">
+      <span class="gd-detail-key">Ghana Card</span>
+      <span class="gd-detail-val">
+        {% if pro.ghana_card_url %}
+          <span class="gd-badge gd-badge--green">Uploaded</span>
+        {% else %}
+          <span class="gd-badge gd-badge--yellow">Not uploaded</span>
+        {% endif %}
+      </span>
+    </div>
+  </div>
+</div>
 {% endblock %}

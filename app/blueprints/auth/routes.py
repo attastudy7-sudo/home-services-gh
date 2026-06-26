@@ -56,7 +56,9 @@ def register():
 @auth_bp.route('/register-pro', methods=['GET', 'POST'])
 def register_pro():
     if current_user.is_authenticated:
-        return redirect(url_for('index'))
+        if current_user.is_pro:
+            return redirect(url_for('pro.dashboard'))
+        return redirect(url_for('auth.become_pro'))
     if request.method == 'POST':
         email = request.form.get('email', '').strip()
         phone = request.form.get('phone', '').strip()
@@ -87,6 +89,26 @@ def register_pro():
         flash('Pro account created. Your profile is pending admin approval.', 'info')
         return redirect(url_for('pro.dashboard'))
     return render_template('auth/register_pro.html')
+
+
+@auth_bp.route('/become-pro', methods=['GET', 'POST'])
+@login_required
+def become_pro():
+    if current_user.is_pro or current_user.is_admin:
+        flash('You already have a pro account.', 'info')
+        return redirect(url_for('pro.dashboard' if current_user.is_pro else 'index'))
+    if request.method == 'POST':
+        business_name = request.form.get('business_name', '').strip()
+        if not business_name:
+            flash('Business name is required.', 'danger')
+            return render_template('auth/become_pro.html')
+        slug = re.sub(r'[^a-z0-9]+', '-', business_name.lower()).strip('-')
+        pro = ProProfile(user_id=current_user.id, business_name=business_name, slug=slug)
+        db.session.add(pro)
+        db.session.commit()
+        flash('Welcome to GhanaServe Pro! Set up your services and areas to start receiving leads.', 'success')
+        return redirect(url_for('pro.onboarding_services'))
+    return render_template('auth/become_pro.html')
 
 
 @auth_bp.route('/logout')

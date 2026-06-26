@@ -6,45 +6,159 @@
   <meta name="csrf-token" content="{{ csrf_token() }}">
   <title>{% block title %}GhanaServe{% endblock %}</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.24.0/dist/tabler-icons.min.css">
   {% block extra_css %}{% endblock %}
 </head>
 <body>
 
-{% block nav %}
-<nav class="gs-nav">
-  <a href="{{ url_for('index') }}" class="gs-nav-logo">GhanaServe</a>
-  <div class="gs-nav-right">
-    {% if current_user.is_authenticated %}
-      <a href="{{ url_for('customer.dashboard') }}" class="gs-nav-link">My Dashboard</a>
-      {% if current_user.is_pro %}
-        <a href="{{ url_for('pro.dashboard') }}" class="gs-nav-link">Pro Dashboard</a>
-      {% endif %}
-      {% if current_user.is_admin %}
-        <a href="{{ url_for('admin.dashboard') }}" class="gs-nav-link">Admin</a>
-      {% endif %}
-      <a href="{{ url_for('auth.logout') }}" class="gs-nav-link">Logout</a>
-    {% else %}
-      <a href="{{ url_for('auth.login') }}" class="gs-nav-link">Login</a>
-      <a href="{{ url_for('auth.register_pro') }}" class="gs-btn-join">Join as a pro</a>
-    {% endif %}
-  </div>
-</nav>
-{% endblock %}
-
+{% block email_banner %}
 {% if current_user.is_authenticated and not current_user.is_verified %}
 <div class="gs-banner-warning">
   Your email is not verified.
   <a href="{{ url_for('auth.resend_verification') }}">Resend verification email</a>
 </div>
 {% endif %}
+{% endblock %}
+
+{% block nav %}
+<nav class="gs-nav">
+  <a href="{{ url_for('index') }}" class="gs-nav-logo">GhanaServe</a>
+  {% block nav_center %}{% endblock %}
+  <div class="gs-nav-right">
+    {% if current_user.is_authenticated %}
+      {% if not current_user.is_pro and not current_user.is_admin %}
+      <a href="{{ url_for('customer.post_request') }}" class="gs-btn-join">Post a job</a>
+      <a href="{{ url_for('auth.become_pro') }}" class="gs-btn-join">Join as a pro</a>
+      {% endif %}
+      <div class="gs-nav-icon" title="Cart">
+        <i class="ti ti-shopping-cart" aria-hidden="true"></i>
+      </div>
+      <div class="gs-nav-dropdown-trigger">
+        <button class="gs-nav-account-btn" aria-haspopup="true" aria-expanded="false">
+          <span class="gs-nav-avatar">{{ current_user.full_name[:1] }}</span>
+          {{ current_user.full_name.split()[0] }} <i class="ti ti-chevron-down"></i>
+        </button>
+        <div class="gs-nav-dropdown" role="menu">
+          {% if current_user.is_admin %}
+            <div class="gs-dropdown-header">Admin</div>
+            <a class="gs-dropdown-item" href="{{ url_for('index') }}"><i class="ti ti-home"></i> Home</a>
+            <a class="gs-dropdown-item" href="{{ url_for('admin.dashboard') }}"><i class="ti ti-layout-dashboard"></i> Dashboard</a>
+            <a class="gs-dropdown-item" href="{{ url_for('admin.pending_pros') }}"><i class="ti ti-clock-hour-4"></i> Pending Pros</a>
+            <a class="gs-dropdown-item" href="{{ url_for('admin.list_users') }}"><i class="ti ti-users"></i> Users</a>
+            <a class="gs-dropdown-item" href="{{ url_for('admin.list_bookings') }}"><i class="ti ti-calendar"></i> Bookings</a>
+            <a class="gs-dropdown-item" href="{{ url_for('admin.list_payments') }}"><i class="ti ti-credit-card"></i> Payments</a>
+            <a class="gs-dropdown-item" href="{{ url_for('admin.list_categories') }}"><i class="ti ti-category"></i> Categories</a>
+          {% elif current_user.is_pro %}
+            <div class="gs-dropdown-header">Pro</div>
+            <a class="gs-dropdown-item" href="{{ url_for('pro.dashboard') }}"><i class="ti ti-layout-dashboard"></i> Dashboard</a>
+            <a class="gs-dropdown-item" href="{{ url_for('pro.leads') }}"><i class="ti ti-bolt"></i> Leads</a>
+            <a class="gs-dropdown-item" href="{{ url_for('pro.my_bookings') }}"><i class="ti ti-calendar"></i> My Bookings</a>
+            <a class="gs-dropdown-item" href="{{ url_for('pro.earnings') }}"><i class="ti ti-cash"></i> Earnings</a>
+            <a class="gs-dropdown-item" href="{{ url_for('pro.profile') }}"><i class="ti ti-user-edit"></i> Profile</a>
+          {% else %}
+            <div class="gs-dropdown-header">{{ current_user.full_name.split()[0] }}</div>
+            <a class="gs-dropdown-item" href="{{ url_for('index') }}"><i class="ti ti-home"></i> Home</a>
+            <a class="gs-dropdown-item" href="{{ url_for('city_landing', city_slug='accra') }}"><i class="ti ti-category"></i> Browse Services</a>
+            <a class="gs-dropdown-item" href="{{ url_for('customer.my_requests') }}"><i class="ti ti-file-text"></i> My Requests</a>
+            <a class="gs-dropdown-item" href="{{ url_for('customer.my_bookings') }}"><i class="ti ti-calendar"></i> My Bookings</a>
+            <a class="gs-dropdown-item" href="{{ url_for('customer.profile') }}"><i class="ti ti-user-edit"></i> Profile</a>
+          {% endif %}
+          <div class="gs-dropdown-divider"></div>
+          <a class="gs-dropdown-item" href="{{ url_for('auth.logout') }}"><i class="ti ti-logout"></i> Log out</a>
+        </div>
+      </div>
+    {% else %}
+      <div class="gs-nav-icon" title="Cart">
+        <i class="ti ti-shopping-cart" aria-hidden="true"></i>
+      </div>
+      <a href="{{ url_for('auth.register_pro') }}" class="gs-btn-join">Join as a pro</a>
+      <a href="{{ url_for('auth.login') }}" class="gs-nav-link">Login</a>
+    {% endif %}
+  </div>
+</nav>
+<script>
+(function() {
+  var t = document.querySelector('.gs-nav-dropdown-trigger');
+  if (t) {
+    var b = t.querySelector('.gs-nav-icon, .gs-nav-account-btn');
+    var m = t.querySelector('.gs-nav-dropdown');
+    if (b && m) {
+      b.addEventListener('click', function(e) { e.stopPropagation(); var open = m.classList.toggle('open'); b.setAttribute('aria-expanded', open); });
+      document.addEventListener('click', function(e) { if (!t.contains(e.target)) { m.classList.remove('open'); b.setAttribute('aria-expanded', 'false'); } });
+    }
+  }
+})();
+</script>
+{% endblock %}
+
+{% block nav_sub %}
+{% if request.endpoint in ('index', 'city_landing', 'category_in_city') %}
+{% include "_nav_sub.html" %}
+{% endif %}
+{% endblock %}
 
 {% with messages = get_flashed_messages(with_categories=true) %}
   {% if messages %}
-  <div class="gs-flash-stack">
+  <div class="gs-toast-viewport" id="gs-toast-viewport">
     {% for category, message in messages %}
-    <div class="gs-flash gs-flash--{{ category }}">{{ message }}</div>
+    <div class="gs-toast gs-toast--{{ category }}" role="alert" aria-live="assertive">
+      <span class="gs-toast-icon" aria-hidden="true">
+        {% if category == 'success' %}
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7.25" stroke="currentColor" stroke-width="1.5"/><path d="M5 8l2 2 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        {% elif category == 'danger' %}
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7.25" stroke="currentColor" stroke-width="1.5"/><path d="M8 5v3.5M8 10.5v.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        {% elif category == 'warning' %}
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2L14.5 13.5H1.5L8 2z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M8 6.5v3M8 11v.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        {% else %}
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7.25" stroke="currentColor" stroke-width="1.5"/><path d="M8 7.5v4M8 5v.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        {% endif %}
+      </span>
+      <span class="gs-toast-msg">{{ message }}</span>
+      <button class="gs-toast-close" aria-label="Dismiss" type="button">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 2l8 8M10 2l-8 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      </button>
+      <div class="gs-toast-progress" aria-hidden="true"></div>
+    </div>
     {% endfor %}
   </div>
+
+  <script>
+  (function () {
+    var DURATION = 4000;
+    var viewport = document.getElementById('gs-toast-viewport');
+    if (!viewport) return;
+
+    function dismiss(toast) {
+      if (toast.dataset.dismissed) return;
+      toast.dataset.dismissed = '1';
+      toast.classList.add('gs-toast--out');
+      toast.addEventListener('animationend', function handler() {
+        toast.removeEventListener('animationend', handler);
+        toast.remove();
+        if (!viewport.children.length) viewport.remove();
+      });
+    }
+
+    Array.prototype.forEach.call(viewport.querySelectorAll('.gs-toast'), function (toast) {
+      // Auto-dismiss
+      var timer = setTimeout(function () { dismiss(toast); }, DURATION);
+
+      // Click anywhere on toast to dismiss
+      toast.addEventListener('click', function () {
+        clearTimeout(timer);
+        dismiss(toast);
+      });
+
+      // Pause timer on hover
+      toast.addEventListener('mouseenter', function () { clearTimeout(timer); toast.querySelector('.gs-toast-progress').style.animationPlayState = 'paused'; });
+      toast.addEventListener('mouseleave', function () {
+        var remaining = parseFloat(toast.querySelector('.gs-toast-progress').style.getPropertyValue('--gs-remaining') || DURATION);
+        toast.querySelector('.gs-toast-progress').style.animationPlayState = 'running';
+        timer = setTimeout(function () { dismiss(toast); }, remaining);
+      });
+    });
+  })();
+  </script>
   {% endif %}
 {% endwith %}
 
@@ -74,14 +188,14 @@
       <div>
         <div class="gs-ql-col-title">Locations</div>
         <ul class="gs-ql-list">
-          <li><a href="{{ url_for('city_landing', city_slug='accra') }}">Accra (All Areas)</a></li>
+          <li><a href="{{ url_for('city_landing', city_slug='accra') }}">Accra</a></li>
           <li><a href="{{ url_for('city_landing', city_slug='east-legon') }}">East Legon</a></li>
           <li><a href="{{ url_for('city_landing', city_slug='osu') }}">Osu</a></li>
           <li><a href="{{ url_for('city_landing', city_slug='labone') }}">Labone</a></li>
           <li><a href="{{ url_for('city_landing', city_slug='cantonments') }}">Cantonments</a></li>
           <li><a href="{{ url_for('city_landing', city_slug='spintex') }}">Spintex</a></li>
           <li><a href="{{ url_for('city_landing', city_slug='tema') }}">Tema</a></li>
-          <li><a href="{{ url_for('city_landing', city_slug='kumasi') }}">Kumasi (All Areas)</a></li>
+          <li><a href="{{ url_for('city_landing', city_slug='kumasi') }}">Kumasi</a></li>
           <li><a href="{{ url_for('city_landing', city_slug='bantama') }}">Bantama</a></li>
           <li><a href="{{ url_for('city_landing', city_slug='adum') }}">Adum</a></li>
         </ul>

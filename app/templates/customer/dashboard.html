@@ -1,12 +1,51 @@
 {% extends "base.html" %}
 {% block title %}My Dashboard — GhanaServe{% endblock %}
+{% block extra_css %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/portal.css') }}">
+{% endblock %}
 {% block content %}
-<h1>Welcome, {{ current_user.full_name }}</h1>
-<p>Open requests: {{ open_requests }} &mdash; Active bookings: {{ active_bookings }}</p>
-<ul>
-  <li><a href="{{ url_for('customer.post_request') }}">Post a new service request</a></li>
-  <li><a href="{{ url_for('customer.my_requests') }}">View my requests</a></li>
-  <li><a href="{{ url_for('customer.my_bookings') }}">View my bookings</a></li>
-  <li><a href="{{ url_for('customer.profile') }}">My profile</a></li>
-</ul>
+<div class="gd-page">
+  <div class="gd-page-header">
+    <div>
+      <div class="gd-page-title">Welcome back, {{ current_user.full_name.split()[0] }}</div>
+      <div class="gd-page-sub">Here's what's happening with your account</div>
+    </div>
+    <a href="{{ url_for('customer.post_request') }}" class="gd-btn"><i class="ti ti-plus"></i> Post a Request</a>
+  </div>
+
+  <div class="gd-stats-row">
+    <div class="gd-stat-card">
+      <div class="gd-stat-num">{{ open_requests }}</div>
+      <div class="gd-stat-label">Open Requests</div>
+    </div>
+    <div class="gd-stat-card">
+      <div class="gd-stat-num">{{ active_bookings }}</div>
+      <div class="gd-stat-label">Active Bookings</div>
+    </div>
+  </div>
+
+  <div class="gd-action-grid">
+    <a href="{{ url_for('customer.post_request') }}" class="gd-action-card">
+      <div class="gd-action-card-icon"><i class="ti ti-plus-circle"></i></div>
+      <div class="gd-action-card-title">Post a service request</div>
+      <div class="gd-action-card-sub">Get quotes from verified pros near you</div>
+    </a>
+    <a href="{{ url_for('customer.my_bookings') }}" class="gd-action-card">
+      <div class="gd-action-card-icon"><i class="ti ti-calendar-check"></i></div>
+      <div class="gd-action-card-title">View my bookings</div>
+      <div class="gd-action-card-sub">Track and manage your confirmed jobs</div>
+    </a>
+  </div>
+
+  <div class="gd-card">
+    <div class="gd-card-header">Quick links</div>
+    <div class="gd-actions">
+      <a href="{{ url_for('customer.my_requests') }}" class="gd-btn gd-btn--ghost">My Requests</a>
+      <a href="{{ url_for('customer.my_bookings') }}" class="gd-btn gd-btn--ghost">My Bookings</a>
+      <a href="{{ url_for('customer.profile') }}" class="gd-btn gd-btn--ghost">My Profile</a>
+    </div>
+  </div>
+</div>
 {% endblock %}

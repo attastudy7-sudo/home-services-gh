@@ -1,10 +1,10 @@
 {% extends "base.html" %}
 {% block title %}Resend Verification — GhanaServe{% endblock %}
 {% block nav %}{% endblock %}
+{% block email_banner %}{% endblock %}
 {% block extra_css %}
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.24.0/dist/tabler-icons.min.css">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
 {% endblock %}
 {% block content %}
@@ -21,15 +21,6 @@
   <div class="ga-form-panel">
     <div class="ga-form-inner">
 
-      {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-        <div class="ga-alerts">
-          {% for category, message in messages %}
-          <div class="ga-alert ga-alert--{{ category }}">{{ message }}</div>
-          {% endfor %}
-        </div>
-        {% endif %}
-      {% endwith %}
 
       <div class="ga-action-card">
         <div class="ga-action-icon">

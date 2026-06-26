@@ -1,24 +1,325 @@
 {% extends "base.html" %}
 {% block title %}Select Your Service Areas — GhanaServe{% endblock %}
+{% block extra_css %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.30.0/dist/tabler-icons.min.css">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/portal.css') }}">
+<style>
+.go-page {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 48px 24px 80px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.go-step-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 48px;
+}
+.go-step {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #9ca3af;
+}
+.go-step--active { color: #0F1F3D; font-weight: 600; }
+.go-step--done { color: #1A7A4A; }
+.go-step-num {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 600;
+  background: #f3f4f6;
+  color: #9ca3af;
+}
+.go-step--active .go-step-num { background: #0F1F3D; color: #fff; }
+.go-step--done .go-step-num { background: #1A7A4A; color: #fff; }
+.go-step-line {
+  width: 40px;
+  height: 1.5px;
+  background: #e5e7eb;
+}
+.go-step-line--filled { background: #1A7A4A; }
+
+.go-header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+.go-header h1 {
+  font-family: 'Sora', sans-serif;
+  font-size: 26px;
+  font-weight: 700;
+  color: #0F1F3D;
+  margin: 0 0 8px;
+  letter-spacing: -0.3px;
+}
+.go-header p {
+  font-size: 14px;
+  color: #6b7280;
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* ── TABS ── */
+.go-tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 28px;
+  background: #f3f4f6;
+  border-radius: 12px;
+  padding: 4px;
+}
+.go-tab {
+  flex: 1;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  font-family: inherit;
+  color: #6b7280;
+  background: transparent;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, box-shadow 0.15s;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+.go-tab:hover { color: #374151; }
+.go-tab--active {
+  background: #fff;
+  color: #0F1F3D;
+  font-weight: 600;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+}
+
+/* ── AREA GRID ── */
+.go-city-panel {
+  display: none;
+}
+.go-city-panel--active {
+  display: block;
+}
+.go-area-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 8px;
+}
+.go-area-pill {
+  position: relative;
+}
+.go-area-pill input[type="checkbox"] {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+.go-area-pill label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #374151;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s, box-shadow 0.15s;
+  user-select: none;
+}
+.go-area-pill label:hover {
+  border-color: #1A7A4A;
+  background: #f0fdf4;
+}
+.go-area-pill input[type="checkbox"]:checked + label {
+  border-color: #1A7A4A;
+  background: #f0fdf4;
+  color: #065F46;
+  box-shadow: 0 0 0 3px rgba(26,122,74,0.08);
+}
+.go-area-pill label .ti {
+  font-size: 14px;
+  color: #9ca3af;
+}
+.go-area-pill input[type="checkbox"]:checked + label .ti {
+  color: #1A7A4A;
+}
+
+/* ── SELECTION COUNT ── */
+.go-count-bar {
+  text-align: center;
+  margin-bottom: 24px;
+  font-size: 13px;
+  color: #6b7280;
+}
+.go-count-bar strong {
+  color: #1A7A4A;
+  font-weight: 600;
+}
+
+/* ── ACTIONS ── */
+.go-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid #f3f4f6;
+}
+.go-actions .go-btn-secondary {
+  font-size: 14px;
+  color: #6b7280;
+  text-decoration: none;
+  padding: 10px 20px;
+  border-radius: 10px;
+  border: 1.5px solid #e5e7eb;
+  font-weight: 500;
+  transition: border-color 0.15s, color 0.15s;
+}
+.go-actions .go-btn-secondary:hover {
+  border-color: #d1d5db;
+  color: #374151;
+}
+.go-actions .go-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 12px 28px;
+  background: #1A7A4A;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.go-actions .go-btn-primary:hover { background: #15663e; }
+
+@media (max-width: 640px) {
+  .go-page { padding: 32px 16px 64px; }
+  .go-header h1 { font-size: 22px; }
+  .go-area-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
+  .go-actions { flex-direction: column-reverse; gap: 12px; }
+  .go-actions .go-btn-primary { width: 100%; justify-content: center; }
+  .go-actions .go-btn-secondary { width: 100%; text-align: center; }
+}
+</style>
+{% endblock %}
+
 {% block content %}
-<h1>Select the areas where you offer services</h1>
-<form method="POST" action="{{ url_for('pro.onboarding_areas') }}">
-  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-  {% set current_city = namespace(val='') %}
-  {% for loc in locations %}
-    {% if loc.city != current_city.val %}
-      {% if current_city.val != '' %}</fieldset>{% endif %}
-      {% set current_city.val = loc.city %}
-      <fieldset class="mb-1em">
-      <legend><strong>{{ loc.city }}</strong></legend>
-    {% endif %}
-    <label>
-      <input type="checkbox" name="location_ids" value="{{ loc.id }}"
-        {{ 'checked' if loc.id in selected_areas else '' }}>
-      {{ loc.area_name }}
-    </label><br>
-  {% endfor %}
-  {% if locations %}</fieldset>{% endif %}
-  <p><button type="submit">Save &amp; go to dashboard</button></p>
-</form>
+<div class="go-page">
+
+  <div class="go-step-indicator">
+    <div class="go-step go-step--done">
+      <span class="go-step-num"><i class="ti ti-check"></i></span>
+      Services
+    </div>
+    <div class="go-step-line go-step-line--filled"></div>
+    <div class="go-step go-step--active">
+      <span class="go-step-num">2</span>
+      Areas
+    </div>
+    <div class="go-step-line"></div>
+    <div class="go-step">
+      <span class="go-step-num">3</span>
+      Dashboard
+    </div>
+  </div>
+
+  <div class="go-header">
+    <h1>Where do you offer services?</h1>
+    <p>Select the neighbourhoods and cities you serve.</p>
+  </div>
+
+  <form method="POST" action="{{ url_for('pro.onboarding_areas') }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+    {% set cities = locations | groupby('city') %}
+
+    <div class="go-tabs" role="tablist">
+      {% for city, areas in cities %}
+      <button type="button" class="go-tab {{ 'go-tab--active' if loop.first else '' }}"
+              role="tab" aria-selected="{{ 'true' if loop.first else 'false' }}"
+              data-index="{{ loop.index0 }}">
+        <i class="ti ti-building"></i> {{ city }}
+      </button>
+      {% endfor %}
+    </div>
+
+    {% for city, areas in cities %}
+    <div class="go-city-panel {{ 'go-city-panel--active' if loop.first else '' }}"
+         id="panel-{{ loop.index0 }}" role="tabpanel">
+      <div class="go-area-grid">
+        {% for loc in areas %}
+        <div class="go-area-pill">
+          <input type="checkbox" name="location_ids" value="{{ loc.id }}"
+            id="loc-{{ loc.id }}"
+            {{ 'checked' if loc.id in selected_areas else '' }}>
+          <label for="loc-{{ loc.id }}">
+            <i class="ti ti-map-pin"></i>
+            {{ loc.area_name }}
+          </label>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endfor %}
+
+    <div class="go-count-bar">
+      <strong id="go-total-count">0</strong> areas selected
+    </div>
+
+    <div class="go-actions">
+      <a href="{{ url_for('pro.dashboard') }}" class="go-btn-secondary">Skip for now</a>
+      <button type="submit" class="go-btn-primary">
+        Save &amp; go to dashboard <i class="ti ti-arrow-right"></i>
+      </button>
+    </div>
+  </form>
+
+</div>
+
+<script>
+(function() {
+  /* ── TABS ── */
+  var tabs = document.querySelectorAll('.go-tab');
+  var panels = document.querySelectorAll('.go-city-panel');
+  tabs.forEach(function(tab) {
+    tab.addEventListener('click', function() {
+      tabs.forEach(function(t){ t.classList.remove('go-tab--active'); t.setAttribute('aria-selected', 'false'); });
+      panels.forEach(function(p){ p.classList.remove('go-city-panel--active'); });
+      this.classList.add('go-tab--active');
+      this.setAttribute('aria-selected', 'true');
+      var index = this.dataset.index;
+      var panel = document.getElementById('panel-' + index);
+      if (panel) panel.classList.add('go-city-panel--active');
+    });
+  });
+
+  /* ── COUNT ── */
+  var countEl = document.getElementById('go-total-count');
+  var allCheckboxes = document.querySelectorAll('.go-area-pill input[type="checkbox"]');
+  function updateCount() {
+    var checked = Array.from(allCheckboxes).filter(function(c){ return c.checked; }).length;
+    countEl.textContent = checked;
+  }
+  allCheckboxes.forEach(function(cb){ cb.addEventListener('change', updateCount); });
+  updateCount();
+})();
+</script>
 {% endblock %}

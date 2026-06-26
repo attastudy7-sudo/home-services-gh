@@ -15,12 +15,7 @@ from datetime import datetime
 @customer_bp.route('/dashboard')
 @login_required
 def dashboard():
-    open_requests = ServiceRequest.query.filter_by(
-        customer_id=current_user.id, status='open').count()
-    active_bookings = Booking.query.filter_by(
-        customer_id=current_user.id, status='confirmed').count()
-    return render_template('customer/dashboard.html',
-        open_requests=open_requests, active_bookings=active_bookings)
+    return redirect(url_for('customer.my_requests'))
 
 
 @customer_bp.route('/post-request', methods=['GET', 'POST'])

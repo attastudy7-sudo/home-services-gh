@@ -1,15 +1,48 @@
 {% extends "base.html" %}
 {% block title %}{{ req.title }} — Lead Detail{% endblock %}
+{% block extra_css %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/portal.css') }}">
+{% endblock %}
 {% block content %}
-<h1>{{ req.title }}</h1>
-<p>{{ req.description }}</p>
-<p>Budget: GH&#8373; {{ req.budget_min or '?' }} – {{ req.budget_max or '?' }}</p>
-<p>Preferred date: {{ req.preferred_date or 'Flexible' }} ({{ req.preferred_time_slot or 'Any time' }})</p>
-<p>{{ 'URGENT REQUEST' if req.is_urgent else '' }}</p>
-{% if existing_quote %}
-  <p>You have already submitted a quote (status: {{ existing_quote.status }}).</p>
-{% else %}
-  <p><a href="{{ url_for('pro.submit_quote', request_id=req.id) }}">Submit a quote</a></p>
-{% endif %}
-<p><a href="{{ url_for('pro.leads') }}">&larr; Back to leads</a></p>
+<div class="gd-page">
+  <div class="gd-page-header">
+    <div>
+      <div class="gd-page-title">{{ req.title }}</div>
+      <div style="margin-top:0.4rem;">
+        <span class="gd-badge gd-badge--gray">{{ req.category.name }}</span>
+        {% if req.is_urgent %}<span class="gd-badge gd-badge--red" style="margin-left:0.3rem;">Urgent</span>{% endif %}
+      </div>
+    </div>
+    <a href="{{ url_for('pro.leads') }}" class="gd-link">&larr; Back to leads</a>
+  </div>
+
+  <div class="gd-card">
+    <div class="gd-card-header">Request details</div>
+    <p style="font-size:0.9rem;line-height:1.7;color:#374151;margin-bottom:1rem;">{{ req.description }}</p>
+    {% if req.budget_min or req.budget_max %}
+    <div class="gd-detail-row">
+      <span class="gd-detail-key">Budget</span>
+      <span class="gd-detail-val">GH&#8373; {{ req.budget_min or '?' }} – {{ req.budget_max or '?' }}</span>
+    </div>
+    {% endif %}
+    {% if req.preferred_date %}
+    <div class="gd-detail-row">
+      <span class="gd-detail-key">Preferred date</span>
+      <span class="gd-detail-val">{{ req.preferred_date.strftime('%d %b %Y') if req.preferred_date else 'Flexible' }} ({{ req.preferred_time_slot | title if req.preferred_time_slot else 'Any time' }})</span>
+    </div>
+    {% endif %}
+  </div>
+
+  {% if existing_quote %}
+  <div class="gd-alert gd-alert--info">
+    <i class="ti ti-info-circle"></i> You have already submitted a quote for this request (status: <strong>{{ existing_quote.status | title }}</strong>).
+  </div>
+  {% else %}
+  <div class="gd-actions">
+    <a href="{{ url_for('pro.submit_quote', request_id=req.id) }}" class="gd-btn"><i class="ti ti-send"></i> Submit a quote</a>
+  </div>
+  {% endif %}
+</div>
 {% endblock %}

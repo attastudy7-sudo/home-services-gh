@@ -1,16 +1,52 @@
 {% extends "base.html" %}
 {% block title %}My Bookings — GhanaServe{% endblock %}
+{% block extra_css %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/portal.css') }}">
+{% endblock %}
 {% block content %}
-<h1>My bookings</h1>
-{% if bookings %}
-  {% for booking in bookings %}
-    <div>
-      <h3><a href="{{ url_for('customer.view_booking', booking_id=booking.id) }}">Booking #{{ booking.id | string | truncate(8, True, '') }}</a></h3>
-      <p>Status: {{ booking.status }} &mdash; Date: {{ booking.scheduled_date }} &mdash; Price: GH&#8373; {{ booking.agreed_price }}</p>
+<div class="gd-page">
+  <div class="gd-page-header">
+    <div class="gd-page-title">My Bookings</div>
+  </div>
+  {% if bookings %}
+    {% for booking in bookings %}
+    <div class="gd-card">
+      <div class="gd-card-header">
+        <a href="{{ url_for('customer.view_booking', booking_id=booking.id) }}" class="gd-link" style="font-size:0.95rem;font-weight:600;color:#1A1A2E;">
+          {{ booking.quote.request.title }}
+        </a>
+        <span class="gd-badge {% if booking.status == 'confirmed' %}gd-badge--blue{% elif booking.status == 'completed' %}gd-badge--green{% elif booking.status in ('cancelled','disputed') %}gd-badge--red{% elif booking.status == 'in_progress' %}gd-badge--yellow{% else %}gd-badge--gray{% endif %}">
+          {{ booking.status | replace('_', ' ') | title }}
+        </span>
+      </div>
+      <div class="gd-detail-row">
+        <span class="gd-detail-key">Pro</span>
+        <span class="gd-detail-val">{{ booking.quote.pro.business_name or booking.quote.pro.user.full_name }}</span>
+      </div>
+      <div class="gd-detail-row">
+        <span class="gd-detail-key">Scheduled</span>
+        <span class="gd-detail-val">{{ booking.scheduled_date.strftime('%d %b %Y') if booking.scheduled_date else 'TBC' }}</span>
+      </div>
+      <div class="gd-detail-row">
+        <span class="gd-detail-key">Agreed price</span>
+        <span class="gd-detail-val">GH&#8373; {{ booking.agreed_price }}</span>
+      </div>
+      <div class="gd-actions" style="margin-top:0.5rem;">
+        <a href="{{ url_for('customer.view_booking', booking_id=booking.id) }}" class="gd-link">View booking &rarr;</a>
+      </div>
     </div>
-    <hr>
-  {% endfor %}
-{% else %}
-  <p>No bookings yet.</p>
-{% endif %}
+    {% endfor %}
+  {% else %}
+  <div class="gd-card">
+    <div class="gd-empty">
+      <div class="gd-empty-icon"><i class="ti ti-calendar-off"></i></div>
+      <p>No bookings yet</p>
+      <div class="gd-empty-sub">Accept a pro's quote to create your first booking</div>
+      <a href="{{ url_for('customer.my_requests') }}" class="gd-btn">View my requests</a>
+    </div>
+  </div>
+  {% endif %}
+</div>
 {% endblock %}

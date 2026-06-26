@@ -96,6 +96,8 @@ class Booking(db.Model):
     cancellation_reason      = db.Column(db.Text)
     cancellation_by          = db.Column(db.String(20))
     completed_at             = db.Column(db.DateTime)
+    started_at               = db.Column(db.DateTime)
+    payout_disbursed_at      = db.Column(db.DateTime)
     created_at               = db.Column(db.DateTime, server_default=db.func.now())
     updated_at               = db.Column(db.DateTime, server_default=db.func.now(), onupdate=db.func.now())
 

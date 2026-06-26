@@ -1,12 +1,63 @@
 {% extends "base.html" %}
 {% block title %}Edit Pro Profile — GhanaServe{% endblock %}
+{% block extra_css %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/portal.css') }}">
+{% endblock %}
 {% block content %}
-<h1>Edit pro profile</h1>
-<form method="POST" action="{{ url_for('pro.edit_profile') }}">
-  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-  <p><label>Full name<br><input type="text" name="full_name" value="{{ current_user.full_name }}" required></label></p>
-  <p><label>Business name<br><input type="text" name="business_name" value="{{ pro.business_name or '' }}" required></label></p>
-  <p><label>Phone<br><input type="text" name="phone" value="{{ current_user.phone }}" required></label></p>
-  <p><button type="submit">Save changes</button></p>
-</form>
+<div class="gd-page">
+  <div class="gd-page-header">
+    <div class="gd-page-title">Edit Pro Profile</div>
+    <a href="{{ url_for('pro.profile') }}" class="gd-link">&larr; Back</a>
+  </div>
+  <div class="gd-card">
+    <form method="POST" action="{{ url_for('pro.edit_profile') }}" enctype="multipart/form-data">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <div class="gd-form-group">
+        <label class="gd-label" for="full_name">Full name</label>
+        <input class="gd-input" type="text" id="full_name" name="full_name" value="{{ current_user.full_name }}" required>
+      </div>
+      <div class="gd-form-group">
+        <label class="gd-label" for="business_name">Business name</label>
+        <input class="gd-input" type="text" id="business_name" name="business_name" value="{{ pro.business_name or '' }}" required>
+      </div>
+      <div class="gd-form-group">
+        <label class="gd-label" for="phone">Phone number</label>
+        <input class="gd-input" type="text" id="phone" name="phone" value="{{ current_user.phone }}" placeholder="+233XXXXXXXXX" required>
+      </div>
+      <div class="gd-form-group">
+        <label class="gd-label" for="bio">Bio</label>
+        <textarea class="gd-textarea" id="bio" name="bio" placeholder="Tell customers about your experience and specialities">{{ pro.bio or '' }}</textarea>
+      </div>
+      <div class="gd-form-group">
+        <label class="gd-label" for="years_experience">Years of experience</label>
+        <input class="gd-input" type="number" id="years_experience" name="years_experience" value="{{ pro.years_experience or 0 }}" min="0">
+      </div>
+      <div class="gd-form-group">
+        <label class="gd-label" for="base_hourly_rate">Base hourly rate (GHS)</label>
+        <input class="gd-input" type="number" id="base_hourly_rate" name="base_hourly_rate" step="0.01" value="{{ pro.base_hourly_rate or '' }}">
+      </div>
+      <div class="gd-form-group">
+        <label class="gd-label" for="availability_note">Availability note</label>
+        <input class="gd-input" type="text" id="availability_note" name="availability_note" value="{{ pro.availability_note or '' }}" placeholder="e.g. Weekdays 8am–5pm">
+      </div>
+      <div class="gd-upload-section">
+        <div class="gd-upload-label">Ghana Card (ID verification)</div>
+        <div class="gd-upload-status">
+          {% if pro.ghana_card_url %}
+            <span class="gd-badge gd-badge--green">Uploaded</span> — upload a new file to replace
+          {% else %}
+            <span class="gd-badge gd-badge--yellow">Not uploaded</span>
+          {% endif %}
+        </div>
+        <input type="file" name="ghana_card" accept="image/*,.pdf">
+      </div>
+      <div class="gd-actions">
+        <button type="submit" class="gd-btn">Save changes</button>
+        <a href="{{ url_for('pro.profile') }}" class="gd-link" style="display:flex;align-items:center;">&larr; Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
 {% endblock %}

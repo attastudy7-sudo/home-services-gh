@@ -1,38 +1,303 @@
 {% extends "base.html" %}
 {% block title %}Select Your Services — GhanaServe{% endblock %}
+{% block extra_css %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.30.0/dist/tabler-icons.min.css">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/portal.css') }}">
+<style>
+.go-page {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 48px 24px 80px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.go-step-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 48px;
+}
+.go-step {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #9ca3af;
+}
+.go-step--active { color: #0F1F3D; font-weight: 600; }
+.go-step--done { color: #1A7A4A; }
+.go-step-num {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 600;
+  background: #f3f4f6;
+  color: #9ca3af;
+}
+.go-step--active .go-step-num { background: #0F1F3D; color: #fff; }
+.go-step--done .go-step-num { background: #1A7A4A; color: #fff; }
+.go-step-line {
+  width: 40px;
+  height: 1.5px;
+  background: #e5e7eb;
+}
+.go-step-line--filled { background: #1A7A4A; }
+
+.go-header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+.go-header h1 {
+  font-family: 'Sora', sans-serif;
+  font-size: 26px;
+  font-weight: 700;
+  color: #0F1F3D;
+  margin: 0 0 8px;
+  letter-spacing: -0.3px;
+}
+.go-header p {
+  font-size: 14px;
+  color: #6b7280;
+  margin: 0;
+  line-height: 1.6;
+}
+
+.go-category {
+  background: #fff;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 14px;
+  margin-bottom: 12px;
+  overflow: hidden;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.go-category:has(input:checked) {
+  border-color: #1A7A4A;
+  box-shadow: 0 0 0 3px rgba(26,122,74,0.08);
+}
+
+.go-cat-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  cursor: pointer;
+  user-select: none;
+}
+.go-cat-header input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  accent-color: #1A7A4A;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+.go-cat-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: #f0fdf4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #1A7A4A;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+.go-cat-name {
+  font-size: 15px;
+  font-weight: 600;
+  color: #0F1F3D;
+  flex: 1;
+}
+.go-cat-toggle {
+  font-size: 18px;
+  color: #9ca3af;
+  transition: transform 0.2s;
+}
+.go-category:has(.go-sub-list) .go-cat-toggle {
+  transform: rotate(180deg);
+}
+
+.go-sub-list {
+  display: none;
+  padding: 0 20px 16px 68px;
+  flex-direction: column;
+  gap: 8px;
+}
+.go-category:has(input:checked) .go-sub-list {
+  display: flex;
+}
+
+.go-sub-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  color: #374151;
+  cursor: pointer;
+  padding: 6px 0;
+}
+.go-sub-label input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: #1A7A4A;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+.go-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid #f3f4f6;
+}
+.go-actions .go-btn-secondary {
+  font-size: 14px;
+  color: #6b7280;
+  text-decoration: none;
+  padding: 10px 20px;
+  border-radius: 10px;
+  border: 1.5px solid #e5e7eb;
+  font-weight: 500;
+  transition: border-color 0.15s, color 0.15s;
+}
+.go-actions .go-btn-secondary:hover {
+  border-color: #d1d5db;
+  color: #374151;
+}
+.go-actions .go-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 12px 28px;
+  background: #1A7A4A;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.go-actions .go-btn-primary:hover { background: #15663e; }
+.go-actions .go-btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+
+@media (max-width: 640px) {
+  .go-page { padding: 32px 16px 64px; }
+  .go-header h1 { font-size: 22px; }
+  .go-cat-header { padding: 14px 16px; }
+  .go-sub-list { padding-left: 60px; }
+  .go-actions { flex-direction: column-reverse; gap: 12px; }
+  .go-actions .go-btn-primary { width: 100%; justify-content: center; }
+  .go-actions .go-btn-secondary { width: 100%; text-align: center; }
+}
+</style>
+{% endblock %}
+
 {% block content %}
-<h1>Select the services you offer</h1>
-<form method="POST" action="{{ url_for('pro.onboarding_services') }}">
-  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-  {% for cat in categories %}
-    <fieldset class="mb-1em">
-      <legend>
-        <label>
-          <input type="checkbox" name="category_ids" value="{{ cat.id }}"
-            {{ 'checked' if cat.id in selected_cats else '' }}
-            onchange="toggleSubcategories(this, 'sub_{{ cat.id }}')">
-          <strong>{{ cat.name }}</strong>
+<div class="go-page">
+
+  <div class="go-step-indicator">
+    <div class="go-step go-step--active">
+      <span class="go-step-num">1</span>
+      Services
+    </div>
+    <div class="go-step-line"></div>
+    <div class="go-step">
+      <span class="go-step-num">2</span>
+      Areas
+    </div>
+    <div class="go-step-line"></div>
+    <div class="go-step">
+      <span class="go-step-num">3</span>
+      Dashboard
+    </div>
+  </div>
+
+  <div class="go-header">
+    <h1>What services do you offer?</h1>
+    <p>Select the categories and specific services you provide. Customers will find you based on these selections.</p>
+  </div>
+
+  <form method="POST" action="{{ url_for('pro.onboarding_services') }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+    {% for cat in categories %}
+    <div class="go-category">
+      <label class="go-cat-header">
+        <input type="checkbox" name="category_ids" value="{{ cat.id }}"
+          {{ 'checked' if cat.id in selected_cats else '' }}
+          onchange="
+            var subs = this.closest('.go-category').querySelector('.go-sub-list');
+            if (subs) subs.querySelectorAll('input[type=checkbox]').forEach(function(c){c.checked=this.checked},this);
+          ">
+        <span class="go-cat-icon">
+          {% if cat.slug == 'plumbing' %}<i class="ti ti-droplet"></i>
+          {% elif cat.slug == 'electrical' %}<i class="ti ti-bolt"></i>
+          {% elif cat.slug == 'cleaning-pest' %}<i class="ti ti-sparkles"></i>
+          {% elif cat.slug == 'painting' %}<i class="ti ti-paint"></i>
+          {% elif cat.slug == 'ac-appliances' %}<i class="ti ti-air-conditioning"></i>
+          {% elif cat.slug == 'carpentry-furniture' %}<i class="ti ti-armchair"></i>
+          {% elif cat.slug == 'moving-storage' %}<i class="ti ti-truck"></i>
+          {% elif cat.slug == 'renovation-construction' %}<i class="ti ti-building"></i>
+          {% elif cat.slug == 'catering' %}<i class="ti ti-chef-hat"></i>
+          {% else %}<i class="ti ti-tool"></i>{% endif %}
+        </span>
+        <span class="go-cat-name">{{ cat.name }}</span>
+        <span class="go-cat-toggle"><i class="ti ti-chevron-down"></i></span>
+      </label>
+      {% set subs = cat.subcategories.filter_by(is_active=True).all() %}
+      {% if subs %}
+      <div class="go-sub-list">
+        {% for sub in subs %}
+        <label class="go-sub-label">
+          <input type="checkbox" name="subcategory_ids" value="{{ sub.id }}"
+            {{ 'checked' if sub.id in selected_subs else '' }}>
+          {{ sub.name }}
         </label>
-      </legend>
-      <div id="sub_{{ cat.id }}" class="ml-2em">
-        {% for sub in cat.subcategories %}
-          <label>
-            <input type="checkbox" name="subcategory_ids" value="{{ sub.id }}"
-              {{ 'checked' if sub.id in selected_subs else '' }}>
-            {{ sub.name }}
-          </label><br>
         {% endfor %}
       </div>
-    </fieldset>
-  {% endfor %}
-  <p><button type="submit">Save &amp; continue to service areas</button></p>
-</form>
+      {% endif %}
+    </div>
+    {% endfor %}
+
+    <div class="go-actions">
+      <a href="{{ url_for('pro.dashboard') }}" class="go-btn-secondary">Skip for now</a>
+      <button type="submit" class="go-btn-primary">
+        Save &amp; continue <i class="ti ti-arrow-right"></i>
+      </button>
+    </div>
+  </form>
+
+</div>
+
 <script>
-function toggleSubcategories(cb, containerId) {
-  const container = document.getElementById(containerId);
-  if (!container) return;
-  const checkboxes = container.querySelectorAll('input[type="checkbox"]');
-  checkboxes.forEach(chk => { chk.checked = cb.checked; });
-}
+(function() {
+  var cats = document.querySelectorAll('.go-category');
+  cats.forEach(function(c) {
+    var cb = c.querySelector('.go-cat-header input[type=checkbox]');
+    var toggles = c.querySelectorAll('.go-sub-label input[type=checkbox]');
+    function updateBulkCheck() {
+      if (cb) {
+        var all = Array.from(toggles);
+        cb.checked = all.length > 0 && all.every(function(t){ return t.checked; });
+        cb.indeterminate = all.some(function(t){ return t.checked; }) && !cb.checked;
+      }
+    }
+    toggles.forEach(function(t) {
+      t.addEventListener('change', updateBulkCheck);
+    });
+  });
+})();
 </script>
 {% endblock %}

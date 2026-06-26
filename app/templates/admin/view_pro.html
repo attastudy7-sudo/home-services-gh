@@ -1,30 +1,91 @@
 {% extends "base.html" %}
 {% block title %}Pro Detail — Admin{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.30.0/dist/tabler-icons.min.css">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+{% endblock %}
+
 {% block content %}
-<h1>Pro: {{ pro.business_name or pro.user.full_name }}</h1>
-<p>Status: <strong>{{ pro.verification_status }}</strong></p>
-<p>Email: {{ pro.user.email }} &mdash; Phone: {{ pro.user.phone }}</p>
-<p>Bio: {{ pro.bio or 'Not provided' }}</p>
-<p>Years experience: {{ pro.years_experience }}</p>
-<p>Ghana Card URL: {{ pro.ghana_card_url or 'Not uploaded' }}</p>
-<p>Certificate URL: {{ pro.certificate_url or 'Not uploaded' }}</p>
-<p>Jobs: {{ pro.total_jobs }} &mdash; Rating: {{ pro.avg_rating }}/5</p>
+<div class="ad-page">
 
-<form method="POST" action="{{ url_for('admin.approve_pro', pro_id=pro.id) }}" class="d-inline">
-  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-  <input type="text" name="note" placeholder="Note (optional)">
-  <button type="submit">Approve</button>
-</form>
-<form method="POST" action="{{ url_for('admin.reject_pro', pro_id=pro.id) }}" class="d-inline">
-  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-  <input type="text" name="note" placeholder="Reason">
-  <button type="submit">Reject</button>
-</form>
-<form method="POST" action="{{ url_for('admin.suspend_pro', pro_id=pro.id) }}" class="d-inline">
-  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-  <input type="text" name="note" placeholder="Reason">
-  <button type="submit">Suspend</button>
-</form>
+  <div class="ad-breadcrumb">
+    <a href="{{ url_for('admin.dashboard') }}">Dashboard</a> &rsaquo;
+    <a href="{{ url_for('admin.pending_pros') }}">Pending approvals</a> &rsaquo;
+    {{ pro.business_name or pro.user.full_name }}
+  </div>
 
-<p><a href="{{ url_for('admin.pending_pros') }}">&larr; Back</a></p>
+  <div class="ad-header">
+    <h1>{{ pro.business_name or pro.user.full_name }}</h1>
+  </div>
+
+  <div class="ad-detail">
+    <div class="ad-detail-grid">
+      <div class="ad-detail-field">
+        <div class="ad-detail-label">Status</div>
+        <div class="ad-detail-value">
+          <span class="ad-badge ad-badge--{{ pro.verification_status }}">{{ pro.verification_status }}</span>
+        </div>
+      </div>
+      <div class="ad-detail-field">
+        <div class="ad-detail-label">Email</div>
+        <div class="ad-detail-value">{{ pro.user.email }}</div>
+      </div>
+      <div class="ad-detail-field">
+        <div class="ad-detail-label">Phone</div>
+        <div class="ad-detail-value">{{ pro.user.phone or '—' }}</div>
+      </div>
+      <div class="ad-detail-field">
+        <div class="ad-detail-label">Years experience</div>
+        <div class="ad-detail-value">{{ pro.years_experience }}</div>
+      </div>
+      <div class="ad-detail-field">
+        <div class="ad-detail-label">Jobs completed</div>
+        <div class="ad-detail-value">{{ pro.total_jobs }}</div>
+      </div>
+      <div class="ad-detail-field">
+        <div class="ad-detail-label">Rating</div>
+        <div class="ad-detail-value">{{ pro.avg_rating }}/5</div>
+      </div>
+      <div class="ad-detail-field" style="grid-column:1/-1;">
+        <div class="ad-detail-label">Bio</div>
+        <div class="ad-detail-value">{{ pro.bio or 'Not provided' }}</div>
+      </div>
+      <div class="ad-detail-field">
+        <div class="ad-detail-label">Ghana Card</div>
+        <div class="ad-detail-value">
+          {% if pro.ghana_card_url %}<a href="{{ pro.ghana_card_url }}" target="_blank">View document</a>{% else %}Not uploaded{% endif %}
+        </div>
+      </div>
+      <div class="ad-detail-field">
+        <div class="ad-detail-label">Certificate</div>
+        <div class="ad-detail-value">
+          {% if pro.certificate_url %}<a href="{{ pro.certificate_url }}" target="_blank">View document</a>{% else %}Not uploaded{% endif %}
+        </div>
+      </div>
+    </div>
+
+    <div class="ad-detail-actions">
+      <form method="POST" action="{{ url_for('admin.approve_pro', pro_id=pro.id) }}" style="display:inline">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input type="text" name="note" class="ad-form-input" placeholder="Note (optional)" style="width:auto;display:inline-block;margin-right:8px;padding:6px 12px;font-size:13px;">
+        <button type="submit" class="ad-btn ad-btn-sm ad-btn-success"><i class="ti ti-circle-check"></i> Approve</button>
+      </form>
+      <form method="POST" action="{{ url_for('admin.reject_pro', pro_id=pro.id) }}" style="display:inline">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input type="text" name="note" class="ad-form-input" placeholder="Reason" style="width:auto;display:inline-block;margin-right:8px;padding:6px 12px;font-size:13px;">
+        <button type="submit" class="ad-btn ad-btn-sm ad-btn-danger"><i class="ti ti-circle-x"></i> Reject</button>
+      </form>
+      <form method="POST" action="{{ url_for('admin.suspend_pro', pro_id=pro.id) }}" style="display:inline">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input type="text" name="note" class="ad-form-input" placeholder="Reason" style="width:auto;display:inline-block;margin-right:8px;padding:6px 12px;font-size:13px;">
+        <button type="submit" class="ad-btn ad-btn-sm ad-btn-warning"><i class="ti ti-pause"></i> Suspend</button>
+      </form>
+    </div>
+  </div>
+
+  <p style="margin-top:20px;">
+    <a href="{{ url_for('admin.pending_pros') }}" class="ad-btn ad-btn-outline">&larr; Back to pending</a>
+  </p>
+
+</div>
 {% endblock %}

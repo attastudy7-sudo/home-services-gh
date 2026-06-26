@@ -1,20 +1,40 @@
 {% extends "base.html" %}
 {% block title %}Leave a Review — GhanaServe{% endblock %}
+{% block extra_css %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/portal.css') }}">
+{% endblock %}
 {% block content %}
-<h1>Review your experience</h1>
-<p>Pro: {{ booking.quote.pro.business_name or booking.quote.pro.user.full_name }}</p>
-<form method="POST" action="{{ url_for('customer.leave_review', booking_id=booking.id) }}">
-  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-  <p><label>Rating (1–5)<br>
-    <select name="rating" required>
-      <option value="5">5 — Excellent</option>
-      <option value="4">4 — Good</option>
-      <option value="3">3 — Average</option>
-      <option value="2">2 — Poor</option>
-      <option value="1">1 — Very poor</option>
-    </select>
-  </label></p>
-  <p><label>Comment<br><textarea name="comment" rows="3"></textarea></label></p>
-  <p><button type="submit">Submit review</button></p>
-</form>
+<div class="gd-page">
+  <div class="gd-page-header">
+    <div>
+      <div class="gd-page-title">Leave a Review</div>
+      <div class="gd-page-sub">{{ booking.quote.pro.business_name or booking.quote.pro.user.full_name }}</div>
+    </div>
+    <a href="{{ url_for('customer.view_booking', booking_id=booking.id) }}" class="gd-link">&larr; Back</a>
+  </div>
+  <div class="gd-card">
+    <form method="POST" action="{{ url_for('customer.leave_review', booking_id=booking.id) }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <div class="gd-form-group">
+        <label class="gd-label">Your rating</label>
+        <div class="gd-stars-input">
+          <input type="radio" id="s5" name="rating" value="5" required><label for="s5" title="Excellent">&#9733;</label>
+          <input type="radio" id="s4" name="rating" value="4"><label for="s4" title="Good">&#9733;</label>
+          <input type="radio" id="s3" name="rating" value="3"><label for="s3" title="Average">&#9733;</label>
+          <input type="radio" id="s2" name="rating" value="2"><label for="s2" title="Poor">&#9733;</label>
+          <input type="radio" id="s1" name="rating" value="1"><label for="s1" title="Very poor">&#9733;</label>
+        </div>
+      </div>
+      <div class="gd-form-group">
+        <label class="gd-label" for="comment">Comment (optional)</label>
+        <textarea class="gd-textarea" id="comment" name="comment" placeholder="What did you think of the service?"></textarea>
+      </div>
+      <div class="gd-actions">
+        <button type="submit" class="gd-btn">Submit review</button>
+      </div>
+    </form>
+  </div>
+</div>
 {% endblock %}

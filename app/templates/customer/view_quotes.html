@@ -1,29 +1,65 @@
 {% extends "base.html" %}
 {% block title %}Quotes for {{ req.title }} — GhanaServe{% endblock %}
+{% block extra_css %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/portal.css') }}">
+{% endblock %}
 {% block content %}
-<h1>Quotes for: {{ req.title }}</h1>
-{% if quotes %}
-  {% for quote in quotes %}
+<div class="gd-page">
+  <div class="gd-page-header">
     <div>
-      <h3>GH&#8373; {{ quote.amount }} &mdash; {{ quote.pro.business_name or quote.pro.user.full_name }}</h3>
-      <p>{{ quote.message }}</p>
-      <p>Available: {{ quote.available_date }} &mdash; Est. hours: {{ quote.estimated_hours or 'Not specified' }}</p>
-      <p>Pro rating: {{ quote.pro.avg_rating }}/5</p>
-      <form method="POST" action="{{ url_for('customer.accept_quote', quote_id=quote.id) }}">
+      <div class="gd-page-title">Quotes</div>
+      <div class="gd-page-sub">For: {{ req.title }}</div>
+    </div>
+    <a href="{{ url_for('customer.view_request', request_id=req.id) }}" class="gd-link">&larr; Back to request</a>
+  </div>
+
+  {% if quotes %}
+    {% for quote in quotes %}
+    <div class="gd-card">
+      <div class="gd-card-header">
+        <a href="{{ url_for('pro.public_profile', slug=quote.pro.slug) }}" class="gd-link" style="font-weight:600;color:#1A1A2E;font-size:1rem;">
+          {{ quote.pro.business_name or quote.pro.user.full_name }}
+        </a>
+        <span style="font-size:1.25rem;font-weight:700;color:#1A7A4A;">GH&#8373; {{ quote.amount }}</span>
+      </div>
+      <div style="margin-bottom:0.75rem;">
+        <span class="gd-stars">{% for i in range(quote.pro.avg_rating | int) %}&#9733;{% endfor %}{% for i in range(5 - (quote.pro.avg_rating | int)) %}&#9734;{% endfor %}</span>
+        <span style="font-size:0.8rem;color:#6B7280;margin-left:0.3rem;">{{ "%.1f" | format(quote.pro.avg_rating) }} ({{ quote.pro.total_reviews }} reviews)</span>
+      </div>
+      <p style="font-size:0.88rem;color:#374151;line-height:1.6;margin-bottom:0.75rem;">{{ quote.message | truncate(180) }}</p>
+      <div class="gd-detail-row">
+        <span class="gd-detail-key">Est. hours</span>
+        <span class="gd-detail-val">{{ quote.estimated_hours or 'Not specified' }}</span>
+      </div>
+      {% if quote.available_date %}
+      <div class="gd-detail-row">
+        <span class="gd-detail-key">Available from</span>
+        <span class="gd-detail-val">{{ quote.available_date.strftime('%d %b %Y') }}</span>
+      </div>
+      {% endif %}
+      <form method="POST" action="{{ url_for('customer.accept_quote', quote_id=quote.id) }}" style="margin-top:1rem;">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-        <label>Payment method:
-          <select name="payment_method">
+        <div class="gd-form-group">
+          <label class="gd-label">Payment method</label>
+          <select class="gd-select" name="payment_method">
             <option value="cash">Cash on completion</option>
             <option value="momo">Mobile Money</option>
           </select>
-        </label>
-        <button type="submit">Accept this quote</button>
+        </div>
+        <button type="submit" class="gd-btn">Accept this quote</button>
       </form>
     </div>
-    <hr>
-  {% endfor %}
-{% else %}
-  <p>No quotes yet. Check back soon.</p>
-{% endif %}
-<p><a href="{{ url_for('customer.view_request', request_id=req.id) }}">&larr; Back to request</a></p>
+    {% endfor %}
+  {% else %}
+  <div class="gd-card">
+    <div class="gd-empty">
+      <div class="gd-empty-icon"><i class="ti ti-clock"></i></div>
+      <p>No quotes yet</p>
+      <div class="gd-empty-sub">Pros in your area will submit quotes soon. Check back shortly.</div>
+    </div>
+  </div>
+  {% endif %}
+</div>
 {% endblock %}

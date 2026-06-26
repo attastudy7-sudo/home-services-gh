@@ -1,16 +1,55 @@
 {% extends "base.html" %}
 {% block title %}Stalled MoMo Payments — Admin{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.30.0/dist/tabler-icons.min.css">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+{% endblock %}
+
 {% block content %}
-<h1>Stalled MoMo payments (callback not received after 2 hours)</h1>
-<p>{{ payments|length }} stalled payment(s).</p>
-{% if payments %}
-  {% for p in payments %}
+<div class="ad-page">
+
+  <div class="ad-breadcrumb">
+    <a href="{{ url_for('admin.dashboard') }}">Dashboard</a> &rsaquo; Stalled MoMo payments
+  </div>
+
+  <div class="ad-header">
     <div>
-      <p>GH&#8373; {{ p.amount }} &mdash; Network: {{ p.momo_network }} &mdash; Wallet: {{ p.payer_momo_number }} &mdash; Ref: {{ p.gateway_ref }} &mdash; Initiated: {{ p.initiated_at.strftime('%d %b %Y %H:%M') }}</p>
+      <h1>Stalled MoMo payments</h1>
+      <div class="ad-header-sub">{{ payments|length }} stalled — callback not received after 2 hours</div>
     </div>
-    <hr>
-  {% endfor %}
-{% else %}
-  <p>No stalled payments. All clear.</p>
-{% endif %}
+  </div>
+
+  {% if payments %}
+  <div class="ad-table-wrap">
+    <table class="ad-table">
+      <thead>
+        <tr>
+          <th>Amount</th>
+          <th>Network</th>
+          <th>Wallet</th>
+          <th>Reference</th>
+          <th>Initiated</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for p in payments %}
+        <tr>
+          <td style="font-weight:600;">GH&#8373; {{ p.amount }}</td>
+          <td>{{ p.momo_network }}</td>
+          <td>{{ p.payer_momo_number }}</td>
+          <td><span class="ad-text-mono">{{ p.gateway_ref }}</span></td>
+          <td style="color:#6b7280;">{{ p.initiated_at.strftime('%d %b %Y %H:%M') }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+    <div class="ad-empty">
+      <i class="ti ti-circle-check ad-empty-icon" style="color:#1A7A4A;"></i>
+      <div class="ad-empty-text">No stalled payments. All clear!</div>
+    </div>
+  {% endif %}
+
+</div>
 {% endblock %}

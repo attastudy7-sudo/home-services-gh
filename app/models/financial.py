@@ -66,7 +66,8 @@ class Notification(db.Model):
     __table_args__ = (
         CheckConstraint(
             "type IN ('new_quote','quote_accepted','booking_confirmed','booking_reminder',"
-            "'review_received','pro_approved','booking_cancelled','payment_received','payout_sent')",
+            "'review_received','pro_approved','booking_cancelled','payment_received','payout_sent',"
+            "'booking_completed','pro_rejected')",
             name='chk_notification_type'
         ),
     )

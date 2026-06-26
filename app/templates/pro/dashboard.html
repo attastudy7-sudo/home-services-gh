@@ -1,35 +1,79 @@
 {% extends "base.html" %}
 {% block title %}Pro Dashboard — GhanaServe{% endblock %}
+{% block extra_css %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/portal.css') }}">
+{% endblock %}
 {% block content %}
-<h1>Pro dashboard — {{ pro.business_name or current_user.full_name }}</h1>
-<p>Verification status: <strong>{{ pro.verification_status }}</strong></p>
-{% if pro.verification_status == 'pending' %}
-  <p>Your profile is under review. You will be notified once approved.</p>
-{% endif %}
-{% set missing = [] %}
-{% if not current_user.phone %}{% set _ = missing.append('phone number') %}{% endif %}
-{% if not pro.business_name %}{% set _ = missing.append('business name') %}{% endif %}
-{% if not pro.bio %}{% set _ = missing.append('bio') %}{% endif %}
-{% if not pro.base_hourly_rate %}{% set _ = missing.append('hourly rate') %}{% endif %}
-{% if not pro.ghana_card_url %}{% set _ = missing.append('Ghana card') %}{% endif %}
-{% if pro.service_areas.count() == 0 %}{% set _ = missing.append('service areas') %}{% endif %}
-{% if missing %}
-  <p class="alert alert-danger">
-    Complete your profile: <strong>{{ missing | join(', ') }}</strong>
-    — <a href="{{ url_for('pro.edit_profile') }}">Edit profile</a>
-  </p>
-{% endif %}
-<p>Available for new jobs: <strong>{{ 'Yes' if pro.is_available else 'No' }}</strong>
-  <form method="POST" action="{{ url_for('pro.toggle_availability') }}" style="display:inline">
-    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-    <button type="submit">{{ 'Go unavailable' if pro.is_available else 'Go available' }}</button>
-  </form>
-</p>
-<p>Open leads: {{ open_leads }} &mdash; Active bookings: {{ active_bookings }} &mdash; Pending quotes: {{ pending_quotes }}</p>
-<ul>
-  <li><a href="{{ url_for('pro.leads') }}">Browse leads</a></li>
-  <li><a href="{{ url_for('pro.my_bookings') }}">My bookings</a></li>
-  <li><a href="{{ url_for('pro.earnings') }}">Earnings</a></li>
-  <li><a href="{{ url_for('pro.profile') }}">My pro profile</a></li>
-</ul>
+<div class="gd-page">
+  <div class="gd-page-header">
+    <div>
+      <div class="gd-page-title">{{ pro.business_name or current_user.full_name }}</div>
+      <div class="gd-page-sub">Pro Dashboard</div>
+    </div>
+    <form method="POST" action="{{ url_for('pro.toggle_availability') }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <button type="submit" class="gd-btn {{ 'gd-btn--ghost' if pro.is_available else '' }}">
+        <i class="ti {{ 'ti-toggle-right' if pro.is_available else 'ti-toggle-left' }}"></i>
+        {{ 'Available' if pro.is_available else 'Unavailable' }}
+      </button>
+    </form>
+  </div>
+
+  {% if pro.verification_status == 'pending' %}
+  <div class="gd-alert gd-alert--warning"><i class="ti ti-clock"></i> Your profile is under review. You will be notified once approved.</div>
+  {% elif pro.verification_status == 'approved' %}
+  <div class="gd-alert gd-alert--success"><i class="ti ti-circle-check"></i> Your profile is approved. You can receive service requests.</div>
+  {% elif pro.verification_status in ('rejected', 'suspended') %}
+  <div class="gd-alert gd-alert--danger"><i class="ti ti-alert-circle"></i> Your profile has been {{ pro.verification_status }}. Contact support for details.</div>
+  {% endif %}
+
+  <div class="gd-stats-row">
+    <div class="gd-stat-card">
+      <div class="gd-stat-num">{{ open_leads }}</div>
+      <div class="gd-stat-label">Open Leads</div>
+    </div>
+    <div class="gd-stat-card">
+      <div class="gd-stat-num">{{ active_bookings }}</div>
+      <div class="gd-stat-label">Active Bookings</div>
+    </div>
+    <div class="gd-stat-card">
+      <div class="gd-stat-num">{{ pending_quotes }}</div>
+      <div class="gd-stat-label">Pending Quotes</div>
+    </div>
+  </div>
+
+  {% set missing = [] %}
+  {% if not current_user.phone %}{% set _ = missing.append('phone number') %}{% endif %}
+  {% if not pro.business_name %}{% set _ = missing.append('business name') %}{% endif %}
+  {% if not pro.bio %}{% set _ = missing.append('bio') %}{% endif %}
+  {% if not pro.base_hourly_rate %}{% set _ = missing.append('hourly rate') %}{% endif %}
+  {% if not pro.ghana_card_url %}{% set _ = missing.append('Ghana Card') %}{% endif %}
+  {% if pro.service_areas.count() == 0 %}{% set _ = missing.append('service areas') %}{% endif %}
+
+  {% if missing %}
+  <div class="gd-card">
+    <div class="gd-card-header">Complete your profile <span class="gd-badge gd-badge--yellow">{{ missing | length }} item{{ 's' if missing | length > 1 }}</span></div>
+    <ul class="gd-checklist">
+      {% for item in missing %}
+      <li><span class="gd-miss-icon"><i class="ti ti-x"></i></span> {{ item | title }} is missing</li>
+      {% endfor %}
+    </ul>
+    <div class="gd-actions" style="margin-top:0.75rem;">
+      <a href="{{ url_for('pro.edit_profile') }}" class="gd-btn">Complete profile</a>
+    </div>
+  </div>
+  {% endif %}
+
+  <div class="gd-card">
+    <div class="gd-card-header">Quick links</div>
+    <div class="gd-actions">
+      <a href="{{ url_for('pro.leads') }}" class="gd-btn gd-btn--ghost"><i class="ti ti-bolt"></i> View leads</a>
+      <a href="{{ url_for('pro.my_bookings') }}" class="gd-btn gd-btn--ghost"><i class="ti ti-calendar"></i> My bookings</a>
+      <a href="{{ url_for('pro.edit_profile') }}" class="gd-btn gd-btn--ghost"><i class="ti ti-pencil"></i> Edit profile</a>
+      <a href="{{ url_for('pro.earnings') }}" class="gd-btn gd-btn--ghost"><i class="ti ti-cash"></i> Earnings</a>
+    </div>
+  </div>
+</div>
 {% endblock %}

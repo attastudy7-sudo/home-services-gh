@@ -6,9 +6,7 @@
       var el = $(overlayId);
       el.style.display = 'flex';
       document.body.style.overflow = 'hidden';
-      /* hide the sticky nav so it doesn't compete with the modal */
       if (nav) nav.classList.add('gs-nav--hidden');
-      /* scroll the search bar into view so the modal feels anchored */
       var searchWrap = document.querySelector('.gs-search-wrap');
       if (searchWrap) {
         searchWrap.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -20,7 +18,6 @@
     function hideModal(overlayId) {
       $(overlayId).style.display = 'none';
       document.body.style.overflow = '';
-      /* restore the nav */
       if (nav) nav.classList.remove('gs-nav--hidden');
     }
 
@@ -28,6 +25,42 @@
     var selectedAreaName = '';
     var selectedCatSlug  = '';
     var selectedCatName  = '';
+
+    function updatePills(slug, name) {
+      $('gs-selected-area-slug').value = slug;
+      $('gs-selected-area-id').value = '';
+      document.querySelectorAll('.gs-quick-pill').forEach(function (pill) {
+        var catSlug = pill.dataset.catSlug;
+        pill.href = '/' + slug + '/' + catSlug;
+        pill.childNodes.forEach(function (n) {
+          if (n.nodeType === 3) {
+            n.textContent = n.textContent.replace(/ in .*$/, ' in ' + name);
+          }
+        });
+      });
+      document.querySelectorAll('.gs-cat-card').forEach(function (card) {
+        var catSlug = card.dataset.catSlug;
+        card.href = '/' + slug + '/' + catSlug;
+      });
+    }
+
+    function restoreSavedArea() {
+      var saved = localStorage.getItem('gs-area');
+      if (saved) {
+        try {
+          var data = JSON.parse(saved);
+          if (data.slug && data.name) {
+            selectedAreaSlug = data.slug;
+            selectedAreaName = data.name;
+            $('gs-selected-area-label').textContent = data.name;
+            document.querySelectorAll('.gs-area-cell').forEach(function (btn) {
+              if (btn.dataset.slug === data.slug) btn.classList.add('selected');
+            });
+            updatePills(data.slug, data.name);
+          }
+        } catch(e) {}
+      }
+    }
 
     function maybeNavigate() {
       if (selectedAreaSlug && selectedCatSlug) {
@@ -67,10 +100,12 @@
         selectedAreaName = this.dataset.name;
         $('gs-selected-area-slug').value = selectedAreaSlug;
         $('gs-selected-area-label').textContent = selectedAreaName;
+        try { localStorage.setItem('gs-area', JSON.stringify({ slug: selectedAreaSlug, name: selectedAreaName })); } catch(e) {}
         document.querySelectorAll('.gs-area-cell').forEach(function (b) {
           b.classList.remove('selected');
         });
         this.classList.add('selected');
+        updatePills(selectedAreaSlug, selectedAreaName);
         hideModal('area-modal-overlay');
         maybeNavigate();
       });
@@ -115,19 +150,19 @@
       }
     });
 
+    restoreSavedArea();
+
     /* ── FAQ ACCORDION ── */
     (function () {
       var items = document.querySelectorAll('.gs-faq-q');
       items.forEach(function (btn) {
         btn.addEventListener('click', function () {
           var isOpen = this.getAttribute('aria-expanded') === 'true';
-          /* close all */
           items.forEach(function (b) {
             b.setAttribute('aria-expanded', 'false');
             var ans = b.nextElementSibling;
             if (ans) ans.hidden = true;
           });
-          /* open clicked one if it was closed */
           if (!isOpen) {
             this.setAttribute('aria-expanded', 'true');
             var answer = this.nextElementSibling;

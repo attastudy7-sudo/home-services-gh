@@ -1,11 +1,31 @@
 {% extends "base.html" %}
 {% block title %}Edit Profile — GhanaServe{% endblock %}
+{% block extra_css %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/portal.css') }}">
+{% endblock %}
 {% block content %}
-<h1>Edit profile</h1>
-<form method="POST" action="{{ url_for('customer.edit_profile') }}">
-  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-  <p><label>Full name<br><input type="text" name="full_name" value="{{ current_user.full_name }}" required></label></p>
-  <p><label>Phone<br><input type="text" name="phone" value="{{ current_user.phone }}" required></label></p>
-  <p><button type="submit">Save changes</button></p>
-</form>
+<div class="gd-page">
+  <div class="gd-page-header">
+    <div class="gd-page-title">Edit Profile</div>
+  </div>
+  <div class="gd-card">
+    <form method="POST" action="{{ url_for('customer.edit_profile') }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <div class="gd-form-group">
+        <label class="gd-label" for="full_name">Full name</label>
+        <input class="gd-input" type="text" id="full_name" name="full_name" value="{{ current_user.full_name }}" required>
+      </div>
+      <div class="gd-form-group">
+        <label class="gd-label" for="phone">Phone number</label>
+        <input class="gd-input" type="text" id="phone" name="phone" value="{{ current_user.phone }}" placeholder="+233XXXXXXXXX" required>
+      </div>
+      <div class="gd-actions">
+        <button type="submit" class="gd-btn">Save changes</button>
+        <a href="{{ url_for('customer.profile') }}" class="gd-link" style="display:flex;align-items:center;">&larr; Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
 {% endblock %}

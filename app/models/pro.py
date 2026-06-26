@@ -45,12 +45,16 @@ class ProCategory(db.Model):
     pro_id      = db.Column(UUID(as_uuid=True), db.ForeignKey('pro_profiles.id', ondelete='CASCADE'), primary_key=True)
     category_id = db.Column(UUID(as_uuid=True), db.ForeignKey('service_categories.id', ondelete='CASCADE'), primary_key=True)
 
+    category = db.relationship('ServiceCategory')
+
 
 class ProSubcategory(db.Model):
     __tablename__ = 'pro_subcategories'
 
     pro_id         = db.Column(UUID(as_uuid=True), db.ForeignKey('pro_profiles.id', ondelete='CASCADE'), primary_key=True)
     subcategory_id = db.Column(UUID(as_uuid=True), db.ForeignKey('service_subcategories.id', ondelete='CASCADE'), primary_key=True)
+
+    subcategory = db.relationship('ServiceSubcategory')
 
 
 class ProServiceArea(db.Model):

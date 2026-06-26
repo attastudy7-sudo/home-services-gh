@@ -1,13 +1,13 @@
 {% extends "base.html" %}
 
-{% block title %}Home Services in {{ area.area_name }} — GhanaServe{% endblock %}
+{% block title %}Home Services in {{ area.area_name if area else city_name }} — GhanaServe{% endblock %}
 
 {% block nav %}{% endblock %}
+{% block nav_sub %}{% endblock %}
 
 {% block extra_css %}
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.24.0/dist/tabler-icons.min.css">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/category.css') }}">
 {% endblock %}
@@ -21,18 +21,27 @@
     <div class="gc-nav-search">
       <i class="ti ti-search" aria-hidden="true"></i>
       <input type="search" id="gcCitySearch" class="gc-nav-search-input"
-             placeholder="Search services in {{ area.area_name }}…" autocomplete="off">
+             placeholder="Search services in {{ area.area_name if area else city_name }}…" autocomplete="off">
       <button class="gc-nav-search-btn" type="button">Search</button>
     </div>
     <div class="gs-nav-right">
-      <a href="{{ url_for('auth.register_pro') }}" class="gs-btn-join">Join as a pro</a>
+      {% if not current_user.is_authenticated or (not current_user.is_pro and not current_user.is_admin) %}
+      <a href="{{ url_for('auth.become_pro' if current_user.is_authenticated else 'auth.register_pro') }}" class="gs-btn-join">Join as a pro</a>
+      {% endif %}
       <div class="gs-nav-icon" title="Cart">
         <i class="ti ti-shopping-cart" aria-hidden="true"></i>
       </div>
       <div class="gs-nav-dropdown-trigger">
+        {% if current_user.is_authenticated %}
+        <button class="gs-nav-account-btn" aria-haspopup="true" aria-expanded="false">
+          <span class="gs-nav-avatar">{{ current_user.full_name[:1] }}</span>
+          {{ current_user.full_name.split()[0] }} <i class="ti ti-chevron-down"></i>
+        </button>
+        {% else %}
         <button class="gs-nav-icon" title="Account" aria-haspopup="true" aria-expanded="false">
           <i class="ti ti-user" aria-hidden="true"></i>
         </button>
+        {% endif %}
         <div class="gs-nav-dropdown" role="menu">
           {% if current_user.is_authenticated %}
             {% if current_user.is_admin %}
@@ -70,16 +79,18 @@
     </div>
   </nav>
 
+  {% include "_nav_sub.html" %}
+
   <!-- CATEGORY GRID -->
   <div class="gc-city-page">
     <nav class="gc-breadcrumb">
       <a href="{{ url_for('index') }}">Home</a>
       <span>&gt;</span>
-      <span>{{ area.area_name }}</span>
+      <span>{{ area.area_name if area else city_name }}</span>
     </nav>
     <div class="gc-cat-grid">
       {% for cat in categories %}
-      <a href="{{ url_for('category_in_city', city_slug=area.slug, category_slug=cat.slug) }}"
+      <a href="{{ url_for('category_in_city', city_slug=area.slug if area else city_name|lower, category_slug=cat.slug) }}"
          class="gc-cat-card"
          data-slug="{{ cat.slug }}"
          data-name="{{ cat.name|lower }}">
@@ -100,6 +111,8 @@
             <i class="ti ti-truck"></i>
           {% elif cat.slug == 'renovation-construction' %}
             <i class="ti ti-building"></i>
+          {% elif cat.slug == 'catering' %}
+            <i class="ti ti-chef-hat"></i>
           {% else %}
             <i class="ti ti-tool"></i>
           {% endif %}
@@ -127,7 +140,7 @@
 (function() {
   var t = document.querySelector('.gs-nav-dropdown-trigger');
   if (t) {
-    var b = t.querySelector('.gs-nav-icon');
+    var b = t.querySelector('.gs-nav-icon, .gs-nav-account-btn');
     var m = t.querySelector('.gs-nav-dropdown');
     b.addEventListener('click', function(e) { e.stopPropagation(); m.classList.toggle('open'); });
     document.addEventListener('click', function(e) { if (!t.contains(e.target)) m.classList.remove('open'); });

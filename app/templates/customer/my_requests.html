@@ -1,17 +1,54 @@
 {% extends "base.html" %}
 {% block title %}My Requests — GhanaServe{% endblock %}
+{% block extra_css %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/portal.css') }}">
+{% endblock %}
 {% block content %}
-<h1>My service requests</h1>
-<p><a href="{{ url_for('customer.post_request') }}">+ Post a new request</a></p>
-{% if requests %}
-  {% for req in requests %}
-    <div>
-      <h3><a href="{{ url_for('customer.view_request', request_id=req.id) }}">{{ req.title }}</a></h3>
-      <p>Status: {{ req.status }} &mdash; Quotes: {{ req.quote_count }} &mdash; Posted: {{ req.created_at.strftime('%d %b %Y') }}</p>
+<div class="gd-page">
+  <div class="gd-page-header">
+    <div class="gd-page-title">My Requests</div>
+    <a href="{{ url_for('customer.post_request') }}" class="gd-btn"><i class="ti ti-plus"></i> Post a request</a>
+  </div>
+
+  {% if requests %}
+    {% for req in requests %}
+    <div class="gd-card">
+      <div class="gd-card-header">
+        <a href="{{ url_for('customer.view_request', request_id=req.id) }}" class="gd-link" style="font-size:1rem;font-weight:600;color:#1A1A2E;">{{ req.title }}</a>
+        <span class="gd-badge {% if req.status == 'open' %}gd-badge--green{% elif req.status in ('cancelled','expired') %}gd-badge--red{% elif req.status == 'matched' %}gd-badge--blue{% else %}gd-badge--gray{% endif %}">
+          {{ req.status | replace('_', ' ') | title }}
+        </span>
+      </div>
+      <div class="gd-detail-row">
+        <span class="gd-detail-key">Quotes</span>
+        <span class="gd-detail-val">{{ req.quote_count }}</span>
+      </div>
+      {% if req.location %}
+      <div class="gd-detail-row">
+        <span class="gd-detail-key">Location</span>
+        <span class="gd-detail-val">{{ req.location.area_name }}, {{ req.location.city }}</span>
+      </div>
+      {% endif %}
+      <div class="gd-detail-row">
+        <span class="gd-detail-key">Posted</span>
+        <span class="gd-detail-val">{{ req.created_at.strftime('%d %b %Y') }}</span>
+      </div>
+      <div class="gd-actions" style="margin-top:0.75rem;">
+        <a href="{{ url_for('customer.view_request', request_id=req.id) }}" class="gd-link">View request &rarr;</a>
+      </div>
     </div>
-    <hr>
-  {% endfor %}
-{% else %}
-  <p>You have not posted any requests yet.</p>
-{% endif %}
+    {% endfor %}
+  {% else %}
+  <div class="gd-card">
+    <div class="gd-empty">
+      <div class="gd-empty-icon"><i class="ti ti-file-description"></i></div>
+      <p>No service requests yet</p>
+      <div class="gd-empty-sub">Post your first request and receive quotes from local pros</div>
+      <a href="{{ url_for('customer.post_request') }}" class="gd-btn">Post a request</a>
+    </div>
+  </div>
+  {% endif %}
+</div>
 {% endblock %}

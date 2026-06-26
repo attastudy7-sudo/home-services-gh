@@ -1,17 +1,65 @@
 {% extends "base.html" %}
 {% block title %}All Users — Admin{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.30.0/dist/tabler-icons.min.css">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+{% endblock %}
+
 {% block content %}
-<h1>All users</h1>
-{% for user in users %}
-  <div>
-    <p><a href="{{ url_for('admin.view_user', user_id=user.id) }}">{{ user.full_name }}</a> &mdash; {{ user.email }} &mdash; {{ user.role }} &mdash; Active: {{ user.is_active }} &mdash; Joined: {{ user.created_at.strftime('%d %b %Y') }}</p>
+<div class="ad-page">
+
+  <div class="ad-breadcrumb">
+    <a href="{{ url_for('admin.dashboard') }}">Dashboard</a> &rsaquo; Users
   </div>
-{% endfor %}
-{% if pagination.pages > 1 %}
-  <p>
-    {% if pagination.has_prev %}<a href="{{ url_for('admin.list_users', page=pagination.prev_num) }}">&larr; Previous</a> {% endif %}
-    Page {{ pagination.page }} of {{ pagination.pages }}
-    {% if pagination.has_next %} <a href="{{ url_for('admin.list_users', page=pagination.next_num) }}">Next &rarr;</a>{% endif %}
-  </p>
-{% endif %}
+
+  <div class="ad-header">
+    <div>
+      <h1>All users</h1>
+      <div class="ad-header-sub">{{ pagination.total }} total</div>
+    </div>
+  </div>
+
+  <div class="ad-table-wrap">
+    <table class="ad-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Role</th>
+          <th>Status</th>
+          <th>Joined</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for user in users %}
+        <tr>
+          <td><a href="{{ url_for('admin.view_user', user_id=user.id) }}">{{ user.full_name }}</a></td>
+          <td>{{ user.email }}</td>
+          <td>{{ user.role }}</td>
+          <td>
+            <span class="ad-badge ad-badge--{{ 'active' if user.is_active else 'inactive' }}">
+              <i class="ti ti-{{ 'circle-check' if user.is_active else 'circle-x' }}"></i>
+              {{ 'Active' if user.is_active else 'Suspended' }}
+            </span>
+          </td>
+          <td style="color:#6b7280;">{{ user.created_at.strftime('%d %b %Y') }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    {% if pagination.pages > 1 %}
+    <div class="ad-pagination">
+      {% if pagination.has_prev %}
+        <a href="{{ url_for('admin.list_users', page=pagination.prev_num) }}"><i class="ti ti-chevron-left"></i> Previous</a>
+      {% endif %}
+      <span>Page {{ pagination.page }} of {{ pagination.pages }}</span>
+      {% if pagination.has_next %}
+        <a href="{{ url_for('admin.list_users', page=pagination.next_num) }}">Next <i class="ti ti-chevron-right"></i></a>
+      {% endif %}
+    </div>
+    {% endif %}
+  </div>
+
+</div>
 {% endblock %}

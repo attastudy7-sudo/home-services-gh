@@ -1,25 +1,50 @@
 {% extends "base.html" %}
 {% block title %}Pending Payouts — Admin{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.30.0/dist/tabler-icons.min.css">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+{% endblock %}
+
 {% block content %}
-<h1>Pending payouts ({{ bookings|length }})</h1>
-{% if bookings %}
-  {% for b in bookings %}
+<div class="ad-page">
+
+  <div class="ad-breadcrumb">
+    <a href="{{ url_for('admin.dashboard') }}">Dashboard</a> &rsaquo; Pending payouts
+  </div>
+
+  <div class="ad-header">
     <div>
-      <p>
-        <strong>{{ b.quote.request.title }}</strong> &mdash;
-        Pro: {{ b.quote.pro.business_name or b.quote.pro.user.full_name }} &mdash;
-        Amount: GH&#8373; {{ b.pro_payout_amount }} &mdash;
-        Completed: {{ b.completed_at.strftime('%d %b %Y') if b.completed_at else 'N/A' }}
-      </p>
-      <form method="POST" action="{{ url_for('admin.disburse_payout', booking_id=b.id) }}">
-        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-        <button type="submit" onclick="return confirm('Disburse GHS {{ b.pro_payout_amount }} to pro?')">Disburse payout</button>
-      </form>
+      <h1>Pending payouts</h1>
+      <div class="ad-header-sub">{{ bookings|length }} booking{{ 's' if bookings|length != 1 }} awaiting disbursement</div>
     </div>
-    <hr>
-  {% endfor %}
-{% else %}
-  <p>No pending payouts.</p>
-{% endif %}
-<p><a href="{{ url_for('admin.dashboard') }}">&larr; Dashboard</a></p>
+  </div>
+
+  {% if bookings %}
+    {% for b in bookings %}
+    <div class="ad-list-item" style="border:1px solid #e5e7eb;border-radius:12px;margin-bottom:10px;padding:18px 20px;">
+      <div class="ad-list-body">
+        <div class="ad-list-title">{{ b.quote.request.title }}</div>
+        <div class="ad-list-meta">
+          Pro: {{ b.quote.pro.business_name or b.quote.pro.user.full_name }}
+          &middot; Completed {{ b.completed_at.strftime('%d %b %Y') if b.completed_at else 'N/A' }}
+        </div>
+      </div>
+      <div class="ad-list-extra">GH&#8373; {{ b.pro_payout_amount }}</div>
+      <div class="ad-list-actions">
+        <form method="POST" action="{{ url_for('admin.disburse_payout', booking_id=b.id) }}" style="display:inline" onsubmit="return confirm('Disburse GH&#8373; {{ b.pro_payout_amount }} to pro?')">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button type="submit" class="ad-btn ad-btn-sm ad-btn-primary"><i class="ti ti-cash"></i> Disburse</button>
+        </form>
+      </div>
+    </div>
+    {% endfor %}
+  {% else %}
+    <div class="ad-empty">
+      <i class="ti ti-cash-off ad-empty-icon"></i>
+      <div class="ad-empty-text">No pending payouts.</div>
+      <a href="{{ url_for('admin.dashboard') }}" class="ad-btn ad-btn-outline">&larr; Back to dashboard</a>
+    </div>
+  {% endif %}
+
+</div>
 {% endblock %}

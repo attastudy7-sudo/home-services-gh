@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}Become a Pro — GhanaServe{% endblock %}
+{% block nav %}{% endblock %}
+{% block email_banner %}{% endblock %}
+{% block extra_css %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
+{% endblock %}
+{% block content %}
+<div class="ga-page">
+
+  <div class="ga-brand ga-brand--pro">
+    <a href="{{ url_for('index') }}" class="ga-brand-logo">GhanaServe</a>
+    <div class="ga-brand-body">
+      <h2 class="ga-brand-headline">Upgrade to Pro<br>and grow your business</h2>
+      <p class="ga-brand-sub">You're already registered — now unlock pro features. Receive job leads, set your own rates, choose your service areas, and get paid via MoMo.</p>
+      <div class="ga-brand-stats">
+        <div>
+          <div class="ga-brand-stat-num">Free</div>
+          <div class="ga-brand-stat-label">To join</div>
+        </div>
+        <div>
+          <div class="ga-brand-stat-num">MoMo</div>
+          <div class="ga-brand-stat-label">Instant payouts</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ga-form-panel">
+    <div class="ga-form-inner">
+      <h1 class="ga-form-title">Start your pro profile</h1>
+      <p class="ga-form-subtitle">We've kept your account details. Just tell us your business name to get started.</p>
+
+      <form method="POST" action="{{ url_for('auth.become_pro') }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+        <div class="ga-field">
+          <label class="ga-label" for="business_name">Business name</label>
+          <input class="ga-input" type="text" id="business_name" name="business_name" placeholder="Kwame Plumbing Services" required autofocus>
+        </div>
+
+        <button type="submit" class="ga-btn">Upgrade to Pro</button>
+      </form>
+
+      <div class="ga-form-links">
+        <div class="ga-divider"></div>
+        <p>Changed your mind? <a href="{{ url_for('index') }}">Back to home</a></p>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+{% block footer %}{% endblock %}

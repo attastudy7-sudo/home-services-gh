@@ -1,69 +1,17 @@
 {% extends 'base.html' %}
 
-{% block nav %}{% endblock %}
-
 {% block extra_css %}
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.24.0/dist/tabler-icons.min.css">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
 {% endblock %}
 
 {% block content %}
 <div class="gs-page">
 
-  <!-- NAV -->
-  <nav class="gs-nav">
-    <a href="{{ url_for('index') }}" class="gs-nav-logo">GhanaServe</a>
-    <div class="gs-nav-right">
-      <a href="{{ url_for('auth.register_pro') }}" class="gs-btn-join">Join as a pro</a>
-      <div class="gs-nav-icon" title="Cart">
-        <i class="ti ti-shopping-cart" aria-hidden="true"></i>
-      </div>
-      <div class="gs-nav-dropdown-trigger">
-        <button class="gs-nav-icon" title="Account" aria-haspopup="true" aria-expanded="false">
-          <i class="ti ti-user" aria-hidden="true"></i>
-        </button>
-        <div class="gs-nav-dropdown" role="menu">
-          {% if current_user.is_authenticated %}
-            {% if current_user.is_admin %}
-            <div class="gs-dropdown-header">Admin</div>
-            <a class="gs-dropdown-item" href="{{ url_for('admin.dashboard') }}"><i class="ti ti-layout-dashboard"></i> Dashboard</a>
-            <a class="gs-dropdown-item" href="{{ url_for('admin.pending_pros') }}"><i class="ti ti-clock-hour-4"></i> Pending Pros</a>
-            <a class="gs-dropdown-item" href="{{ url_for('admin.list_users') }}"><i class="ti ti-users"></i> Users</a>
-            <a class="gs-dropdown-item" href="{{ url_for('admin.list_bookings') }}"><i class="ti ti-calendar"></i> Bookings</a>
-            <a class="gs-dropdown-item" href="{{ url_for('admin.list_payments') }}"><i class="ti ti-credit-card"></i> Payments</a>
-            <a class="gs-dropdown-item" href="{{ url_for('admin.list_categories') }}"><i class="ti ti-category"></i> Categories</a>
-            {% elif current_user.is_pro %}
-            <div class="gs-dropdown-header">Pro</div>
-            <a class="gs-dropdown-item" href="{{ url_for('pro.dashboard') }}"><i class="ti ti-layout-dashboard"></i> Dashboard</a>
-            <a class="gs-dropdown-item" href="{{ url_for('pro.leads') }}"><i class="ti ti-briefcase"></i> Leads</a>
-            <a class="gs-dropdown-item" href="{{ url_for('pro.my_bookings') }}"><i class="ti ti-calendar"></i> My Bookings</a>
-            <a class="gs-dropdown-item" href="{{ url_for('pro.earnings') }}"><i class="ti ti-coin"></i> Earnings</a>
-            <a class="gs-dropdown-item" href="{{ url_for('pro.profile') }}"><i class="ti ti-user-edit"></i> Profile</a>
-            {% else %}
-            <div class="gs-dropdown-header">Customer</div>
-            <a class="gs-dropdown-item" href="{{ url_for('customer.dashboard') }}"><i class="ti ti-layout-dashboard"></i> Dashboard</a>
-            <a class="gs-dropdown-item" href="{{ url_for('customer.my_requests') }}"><i class="ti ti-file-text"></i> My Requests</a>
-            <a class="gs-dropdown-item" href="{{ url_for('customer.my_bookings') }}"><i class="ti ti-calendar"></i> My Bookings</a>
-            <a class="gs-dropdown-item" href="{{ url_for('customer.profile') }}"><i class="ti ti-user-edit"></i> Profile</a>
-            {% endif %}
-            <div class="gs-dropdown-divider"></div>
-            <a class="gs-dropdown-item" href="{{ url_for('auth.logout') }}"><i class="ti ti-logout"></i> Log out</a>
-          {% else %}
-            <div class="gs-dropdown-header">Account</div>
-            <a class="gs-dropdown-item" href="{{ url_for('auth.login') }}"><i class="ti ti-login"></i> Log in</a>
-            <a class="gs-dropdown-item" href="{{ url_for('auth.register') }}"><i class="ti ti-user-plus"></i> Create account</a>
-            <a class="gs-dropdown-item" href="{{ url_for('auth.register_pro') }}"><i class="ti ti-briefcase"></i> Join as a Pro</a>
-          {% endif %}
-        </div>
-      </div>
-    </div>
-  </nav>
-
-  <!-- ═══════════════════════════════════════════════
+  <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
        ABOVE-FOLD: hero + category row fill viewport
-       ═══════════════════════════════════════════════ -->
+       â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
   <div class="gs-above-fold">
 
   <!-- HERO -->
@@ -99,15 +47,15 @@
 
   </section>
 
-  <!-- ═══════════════════════════════════════════════
+  <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
        SECTION 1: CATEGORY SCROLL ROW
-       ═══════════════════════════════════════════════ -->
+       â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
   <section class="gs-cats">
     <div class="gs-cats-scroll">
 
       {% for cat in categories %}
       <a href="{{ url_for('category_in_city', city_slug='accra', category_slug=cat.slug) }}"
-         class="gs-cat-card">
+         class="gs-cat-card" data-cat-slug="{{ cat.slug }}">
         <div class="gs-cat-icon-wrap">
           {% if cat.slug == 'plumbing' %}
             <i class="ti ti-droplet" aria-hidden="true"></i>
@@ -125,6 +73,8 @@
             <i class="ti ti-truck" aria-hidden="true"></i>
           {% elif cat.slug == 'renovation-construction' %}
             <i class="ti ti-building" aria-hidden="true"></i>
+          {% elif cat.slug == 'catering' %}
+            <i class="ti ti-chef-hat" aria-hidden="true"></i>
           {% else %}
             <i class="ti ti-tool" aria-hidden="true"></i>
           {% endif %}
@@ -137,31 +87,31 @@
   </section>
 
   <div class="gs-quick-pills">
-    <a href="{{ url_for('category_in_city', city_slug='accra', category_slug='plumbing') }}" class="gs-quick-pill">
+    <a href="{{ url_for('category_in_city', city_slug='accra', category_slug='plumbing') }}" class="gs-quick-pill" data-cat-slug="plumbing">
       <i class="ti ti-droplet"></i> Plumber in Accra
     </a>
-    <a href="{{ url_for('category_in_city', city_slug='accra', category_slug='ac-appliances') }}" class="gs-quick-pill">
+    <a href="{{ url_for('category_in_city', city_slug='accra', category_slug='ac-appliances') }}" class="gs-quick-pill" data-cat-slug="ac-appliances">
       <i class="ti ti-air-conditioning"></i> AC Repair in Accra
     </a>
-    <a href="{{ url_for('category_in_city', city_slug='accra', category_slug='painting') }}" class="gs-quick-pill">
+    <a href="{{ url_for('category_in_city', city_slug='accra', category_slug='painting') }}" class="gs-quick-pill" data-cat-slug="painting">
       <i class="ti ti-paint"></i> Painter in Accra
     </a>
-    <a href="{{ url_for('category_in_city', city_slug='accra', category_slug='cleaning-pest') }}" class="gs-quick-pill">
+    <a href="{{ url_for('category_in_city', city_slug='accra', category_slug='cleaning-pest') }}" class="gs-quick-pill" data-cat-slug="cleaning-pest">
       <i class="ti ti-sparkles"></i> Cleaning in Accra
     </a>
-    <a href="{{ url_for('category_in_city', city_slug='accra', category_slug='carpentry-furniture') }}" class="gs-quick-pill">
+    <a href="{{ url_for('category_in_city', city_slug='accra', category_slug='carpentry-furniture') }}" class="gs-quick-pill" data-cat-slug="carpentry-furniture">
       <i class="ti ti-armchair"></i> Carpenter in Accra
     </a>
-    <a href="{{ url_for('category_in_city', city_slug='accra', category_slug='electrical') }}" class="gs-quick-pill">
+    <a href="{{ url_for('category_in_city', city_slug='accra', category_slug='electrical') }}" class="gs-quick-pill" data-cat-slug="electrical">
       <i class="ti ti-bolt"></i> Electrician in Accra
     </a>
   </div>
 
   </div><!-- /.gs-above-fold -->
 
-  <!-- ═══════════════════════════════════════════════
+  <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
        POPULAR SERVICES BANNER
-       ═══════════════════════════════════════════════ -->
+       â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
   <section class="gs-popular">
 
     <div class="gs-popular-bg-slides">
@@ -244,9 +194,9 @@
     </div>
   </section>
 
-  <!-- ═══════════════════════════════════════════════
+  <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
        SECTION 2: HOW IT WORKS
-       ═══════════════════════════════════════════════ -->
+       â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
   <section class="gs-how">
     <div class="gs-how-inner">
 
@@ -303,9 +253,9 @@
     </div>
   </section>
 
-  <!-- ═══════════════════════════════════════════════
+  <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
        SECTION 3: WHY CHOOSE GHANASERVE
-       ═══════════════════════════════════════════════ -->
+       â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
   <section class="gs-why">
     <div class="gs-why-inner">
 
@@ -384,9 +334,9 @@
     </div>
   </section>
 
-  <!-- ═══════════════════════════════════════════════
+  <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
        SECTION 4: TRUST BAR
-       ═══════════════════════════════════════════════ -->
+       â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
   <section class="gs-trust">
     <div class="gs-trust-inner">
 
@@ -425,9 +375,9 @@
     </div>
   </section>
 
-  <!-- ═══════════════════════════════════════════════
+  <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
        SECTION 5: TRUSTED BY — AREAS GRID
-       ═══════════════════════════════════════════════ -->
+       â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
   <section class="gs-areas">
     <div class="gs-areas-inner">
 
@@ -452,9 +402,9 @@
     </div>
   </section>
 
-  <!-- ═══════════════════════════════════════════════
+  <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
        SECTION 6: FAQ ACCORDION
-       ═══════════════════════════════════════════════ -->
+       â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
   <section class="gs-faq">
     <div class="gs-faq-inner">
 
@@ -547,9 +497,9 @@
     </div>
   </section>
 
-  <!-- ═══════════════════════════════════════════════
+  <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
        SECTION 7: PRO CTA BANNER
-       ═══════════════════════════════════════════════ -->
+       â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
   <section class="gs-pro-banner">
     <div class="gs-pro-banner-inner">
 
@@ -588,13 +538,13 @@
     </div>
   </section>
 
-  <!-- ═══════════════════ AREA MODAL ═══════════════════ -->
+  <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• AREA MODAL â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
   <div class="gs-modal-overlay" id="area-modal-overlay" role="dialog" aria-modal="true" aria-label="Select your area" style="display:none">
     <div class="gs-modal-card" id="area-modal-card">
 
       <div class="gs-modal-sticky-header">
         <div class="gs-modal-header">
-          <span class="gs-modal-logo">LOGO</span>
+          <a href="{{ url_for('index') }}" class="gs-nav-logo">GhanaServe</a>
           <button class="gs-modal-close" id="close-area-modal" aria-label="Close modal" type="button">
             <i class="ti ti-x" aria-hidden="true"></i>
           </button>
@@ -627,7 +577,7 @@
   </div>
 </div>
 
-  <!-- ═══════════════════ SERVICE MODAL ═══════════════════ -->
+  <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• SERVICE MODAL â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
   <div class="gs-modal-overlay" id="service-modal-overlay" role="dialog" aria-modal="true" aria-label="Select a service" style="display:none">
     <div class="gs-modal-card gs-modal-card--service" id="service-modal-card">
 
@@ -673,15 +623,26 @@
   <input type="hidden" id="gs-selected-service-slug" value="">
 
   <script>
-  (function() {
-    var t = document.querySelector('.gs-nav-dropdown-trigger');
-    if (t) {
-      var b = t.querySelector('.gs-nav-icon');
-      var m = t.querySelector('.gs-nav-dropdown');
-      b.addEventListener('click', function(e) { e.stopPropagation(); m.classList.toggle('open'); });
-      document.addEventListener('click', function(e) { if (!t.contains(e.target)) m.classList.remove('open'); });
+  var aboveFold = document.querySelector('.gs-above-fold');
+  var subNav = document.querySelector('.gs-nav-sub');
+  var page = document.querySelector('.gs-page');
+  if (aboveFold && subNav && page) {
+    subNav.style.display = 'none';
+    function onScroll() {
+      var foldBottom = aboveFold.getBoundingClientRect().bottom;
+      if (foldBottom <= 0) {
+        subNav.style.display = '';
+        subNav.classList.add('gs-nav-sub--active');
+        page.style.paddingTop = subNav.offsetHeight + 'px';
+      } else {
+        subNav.classList.remove('gs-nav-sub--active');
+        subNav.style.display = 'none';
+        page.style.paddingTop = '';
+      }
     }
-  })();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+  }
   </script>
   <script src="{{ url_for('static', filename='js/index.js') }}"></script>
 

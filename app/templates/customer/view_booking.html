@@ -1,32 +1,87 @@
 {% extends "base.html" %}
 {% block title %}Booking Detail — GhanaServe{% endblock %}
+{% block extra_css %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/portal.css') }}">
+{% endblock %}
 {% block content %}
-<h1>Booking detail</h1>
-<p>Status: <strong>{{ booking.status }}</strong></p>
-<p>Scheduled: {{ booking.scheduled_date }} {{ booking.scheduled_time_slot or '' }}</p>
-<p>Agreed price: GH&#8373; {{ booking.agreed_price }}</p>
-<p>Payment method: {{ booking.payment_method }}</p>
-<p>Payment status: {{ booking.payment_status }}</p>
-<p>Pro: <a href="{{ url_for('pro.public_profile', slug=booking.quote.pro.slug) }}">{{ booking.quote.pro.business_name or booking.quote.pro.user.full_name }}</a></p>
+<div class="gd-page">
+  <div class="gd-page-header">
+    <div>
+      <div class="gd-page-title">{{ booking.quote.request.title }}</div>
+      <div style="margin-top:0.4rem;">
+        <span class="gd-badge {% if booking.status == 'confirmed' %}gd-badge--blue{% elif booking.status == 'completed' %}gd-badge--green{% elif booking.status in ('cancelled','disputed') %}gd-badge--red{% elif booking.status == 'in_progress' %}gd-badge--yellow{% else %}gd-badge--gray{% endif %}">
+          {{ booking.status | replace('_', ' ') | title }}
+        </span>
+      </div>
+    </div>
+    <a href="{{ url_for('customer.my_bookings') }}" class="gd-link">&larr; My bookings</a>
+  </div>
 
-{% if booking.status == 'confirmed' %}
-  {% if booking.payment_method != 'cash' and booking.payment_status != 'paid' %}
-    <p><a href="{{ url_for('customer.initiate_payment', booking_id=booking.id) }}">Pay now</a></p>
+  <div class="gd-card">
+    <div class="gd-card-header">Booking summary</div>
+    <div class="gd-detail-row">
+      <span class="gd-detail-key">Pro</span>
+      <span class="gd-detail-val"><a href="{{ url_for('pro.public_profile', slug=booking.quote.pro.slug) }}" class="gd-link">{{ booking.quote.pro.business_name or booking.quote.pro.user.full_name }}</a></span>
+    </div>
+    <div class="gd-detail-row">
+      <span class="gd-detail-key">Scheduled</span>
+      <span class="gd-detail-val">{{ booking.scheduled_date.strftime('%d %b %Y') if booking.scheduled_date else 'TBC' }}{{ ' (' + (booking.scheduled_time_slot | title) + ')' if booking.scheduled_time_slot else '' }}</span>
+    </div>
+    <div class="gd-detail-row">
+      <span class="gd-detail-key">Agreed price</span>
+      <span class="gd-detail-val">GH&#8373; {{ booking.agreed_price }}</span>
+    </div>
+    <div class="gd-detail-row">
+      <span class="gd-detail-key">Payment method</span>
+      <span class="gd-detail-val">{{ booking.payment_method | title if booking.payment_method else '—' }}</span>
+    </div>
+    <div class="gd-detail-row">
+      <span class="gd-detail-key">Payment status</span>
+      <span class="gd-detail-val">
+        <span class="gd-badge {% if booking.payment_status == 'paid' %}gd-badge--green{% elif booking.payment_status == 'unpaid' %}gd-badge--yellow{% else %}gd-badge--gray{% endif %}">
+          {{ booking.payment_status | replace('_', ' ') | title }}
+        </span>
+      </span>
+    </div>
+  </div>
+
+  {% if booking.status == 'confirmed' %}
+    {% if booking.payment_method != 'cash' and booking.payment_status != 'paid' %}
+    <div class="gd-actions">
+      <a href="{{ url_for('customer.initiate_payment', booking_id=booking.id) }}" class="gd-btn">Pay now</a>
+    </div>
+    {% endif %}
+    <div class="gd-card" style="margin-top:0.5rem;">
+      <div class="gd-card-header" style="color:#991B1B;">Cancel booking</div>
+      <form method="POST" action="{{ url_for('customer.cancel_booking', booking_id=booking.id) }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="gd-form-group">
+          <label class="gd-label" for="reason">Reason for cancellation</label>
+          <input class="gd-input" type="text" id="reason" name="reason" placeholder="Optional">
+        </div>
+        <button type="submit" class="gd-btn gd-btn--danger gd-btn--sm" onclick="return confirm('Cancel this booking?')">Cancel booking</button>
+      </form>
+    </div>
   {% endif %}
-  <form method="POST" action="{{ url_for('customer.cancel_booking', booking_id=booking.id) }}">
-    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-    <label>Reason for cancellation<br><input type="text" name="reason"></label>
-    <button type="submit" onclick="return confirm('Cancel this booking?')">Cancel booking</button>
-  </form>
-{% endif %}
 
-{% if booking.status == 'completed' %}
-  {% if review %}
-    <p>Your review: {{ review.rating }}/5 &mdash; {{ review.comment }}</p>
-  {% else %}
-    <p><a href="{{ url_for('customer.leave_review', booking_id=booking.id) }}">Leave a review</a></p>
+  {% if booking.status == 'completed' %}
+    <div class="gd-card" style="border-color:#A7F3D0;background:#F0FDF4;">
+      <div class="gd-card-header" style="color:#065F46;">Job completed</div>
+      {% if review %}
+        <div class="gd-detail-row">
+          <span class="gd-detail-key">Your rating</span>
+          <span class="gd-detail-val"><span class="gd-stars">{% for i in range(review.rating) %}&#9733;{% endfor %}{% for i in range(5 - review.rating) %}&#9734;{% endfor %}</span></span>
+        </div>
+        {% if review.comment %}
+        <p style="font-size:0.88rem;color:#374151;margin-top:0.5rem;">{{ review.comment }}</p>
+        {% endif %}
+      {% else %}
+        <p style="font-size:0.9rem;color:#374151;margin-bottom:1rem;">How was the service? Leave a review for {{ booking.quote.pro.business_name or booking.quote.pro.user.full_name }}.</p>
+        <a href="{{ url_for('customer.leave_review', booking_id=booking.id) }}" class="gd-btn">Leave a review</a>
+      {% endif %}
+    </div>
   {% endif %}
-{% endif %}
-
-<p><a href="{{ url_for('customer.my_bookings') }}">&larr; Back to bookings</a></p>
+</div>
 {% endblock %}

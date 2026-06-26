@@ -1,18 +1,316 @@
 {% extends "base.html" %}
 {% block title %}Manage Categories — Admin{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.30.0/dist/tabler-icons.min.css">
+<style>
+.ad-page {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 40px 24px 80px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  color: #1A1A2E;
+}
+
+.ad-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 32px;
+}
+.ad-header h1 {
+  font-family: 'Sora', 'Inter', sans-serif;
+  font-size: 24px;
+  font-weight: 700;
+  color: #0F1F3D;
+  margin: 0;
+  letter-spacing: -0.3px;
+}
+.ad-header-sub {
+  font-size: 13px;
+  color: #6b7280;
+  margin-top: 3px;
+}
+
+.ad-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 20px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.15s;
+}
+.ad-btn-primary {
+  background: #1A7A4A;
+  color: #fff;
+}
+.ad-btn-primary:hover { background: #15663e; color: #fff; }
+.ad-btn-sm {
+  padding: 6px 12px;
+  font-size: 12px;
+  border-radius: 8px;
+}
+.ad-btn-outline {
+  background: transparent;
+  border: 1px solid #d1d5db;
+  color: #374151;
+}
+.ad-btn-outline:hover {
+  background: #f9fafb;
+  border-color: #9ca3af;
+}
+.ad-btn-danger {
+  background: #fee2e2;
+  color: #991b1b;
+}
+.ad-btn-danger:hover { background: #fecaca; }
+.ad-btn-success {
+  background: #d1fae5;
+  color: #065f46;
+}
+.ad-btn-success:hover { background: #a7f3d0; }
+
+/* ── STATS BAR ── */
+.ad-stats {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 28px;
+}
+.ad-stat-card {
+  flex: 1;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 16px 20px;
+}
+.ad-stat-value {
+  font-family: 'Sora', sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: #0F1F3D;
+}
+.ad-stat-label {
+  font-size: 12px;
+  color: #6b7280;
+  margin-top: 2px;
+}
+
+/* ── CATEGORY CARD ── */
+.ad-cat {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  margin-bottom: 12px;
+  overflow: hidden;
+}
+.ad-cat-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 20px;
+  cursor: pointer;
+  transition: background 0.1s;
+}
+.ad-cat-header:hover { background: #f9fafb; }
+.ad-cat-num {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: #f0fdf4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: #1A7A4A;
+  flex-shrink: 0;
+  font-family: 'Sora', sans-serif;
+}
+.ad-cat-info { flex: 1; }
+.ad-cat-name {
+  font-family: 'Sora', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  color: #0F1F3D;
+}
+.ad-cat-slug {
+  font-size: 12px;
+  color: #9ca3af;
+  font-weight: 400;
+  margin-left: 8px;
+  font-family: 'Inter', monospace;
+}
+.ad-cat-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+}
+.ad-cat-badge--active { background: #d1fae5; color: #065f46; }
+.ad-cat-badge--inactive { background: #fee2e2; color: #991b1b; }
+
+.ad-cat-chevron {
+  color: #9ca3af;
+  transition: transform 0.2s;
+  font-size: 18px;
+}
+
+/* ── SUBCATEGORIES ── */
+.ad-subs {
+  border-top: 1px solid #f3f4f6;
+  padding: 16px 20px 16px 62px;
+  display: none;
+}
+.ad-subs.open { display: block; }
+.ad-subs-title {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #9ca3af;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+.ad-subs-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.ad-sub-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 11px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 500;
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.ad-cat-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* ── EMPTY ── */
+.ad-empty {
+  text-align: center;
+  padding: 48px 24px;
+  background: #fff;
+  border: 1px dashed #d1d5db;
+  border-radius: 14px;
+  color: #6b7280;
+}
+
+/* ── BREADCRUMB ── */
+.ad-breadcrumb {
+  font-size: 13px;
+  color: #6b7280;
+  margin-bottom: 20px;
+}
+.ad-breadcrumb a {
+  color: #1A7A4A;
+  text-decoration: none;
+  font-weight: 500;
+}
+.ad-breadcrumb a:hover { text-decoration: underline; }
+</style>
+{% endblock %}
+
 {% block content %}
-<h1>Service categories</h1>
-<p><a href="{{ url_for('admin.new_category') }}">+ Add new category</a></p>
-{% for cat in categories %}
-  <div>
-    <p>
-      {{ cat.sort_order }}. <strong>{{ cat.name }}</strong> ({{ cat.slug }}) &mdash;
-      {{ 'Active' if cat.is_active else 'Inactive' }} &mdash;
-      <form method="POST" action="{{ url_for('admin.toggle_category', category_id=cat.id) }}" class="d-inline">
-        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-        <button type="submit">{{ 'Deactivate' if cat.is_active else 'Activate' }}</button>
-      </form>
-    </p>
+<div class="ad-page">
+
+  <div class="ad-breadcrumb">
+    <a href="{{ url_for('admin.dashboard') }}">Dashboard</a> &rsaquo; Categories
   </div>
-{% endfor %}
+
+  <div class="ad-header">
+    <div>
+      <h1>Service categories</h1>
+      <div class="ad-header-sub">{{ categories|length }} categories &middot; {{ categories|selectattr('is_active')|list|length }} active</div>
+    </div>
+    <a href="{{ url_for('admin.new_category') }}" class="ad-btn ad-btn-primary">
+      <i class="ti ti-plus"></i> Add category
+    </a>
+  </div>
+
+  <div class="ad-stats">
+    <div class="ad-stat-card">
+      <div class="ad-stat-value">{{ categories|length }}</div>
+      <div class="ad-stat-label">Total categories</div>
+    </div>
+    <div class="ad-stat-card">
+      <div class="ad-stat-value">{{ categories|selectattr('is_active')|list|length }}</div>
+      <div class="ad-stat-label">Active</div>
+    </div>
+    <div class="ad-stat-card">
+      <div class="ad-stat-value">{{ categories|rejectattr('is_active')|list|length }}</div>
+      <div class="ad-stat-label">Inactive</div>
+    </div>
+  </div>
+
+  {% if categories %}
+    {% for cat in categories %}
+    <div class="ad-cat">
+      <div class="ad-cat-header" onclick="toggleSubs(this)">
+        <div class="ad-cat-num">{{ cat.sort_order }}</div>
+        <div class="ad-cat-info">
+          <span class="ad-cat-name">{{ cat.name }}</span>
+          <span class="ad-cat-slug">{{ cat.slug }}</span>
+        </div>
+        {% set sub_count = cat.subcategories.count() %}
+        <span style="font-size:12px;color:#6b7280;font-weight:500;">{{ sub_count }} sub{{ 's' if sub_count != 1 }}</span>
+        <span class="ad-cat-badge ad-cat-badge--{{ 'active' if cat.is_active else 'inactive' }}">
+          <i class="ti ti-{{ 'circle-check' if cat.is_active else 'circle-x' }}"></i>
+          {{ 'Active' if cat.is_active else 'Inactive' }}
+        </span>
+        <div class="ad-cat-actions">
+          <form method="POST" action="{{ url_for('admin.toggle_category', category_id=cat.id) }}" style="display:inline">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" class="ad-btn ad-btn-sm ad-btn-{{ 'danger' if cat.is_active else 'success' }}">
+              <i class="ti ti-{{ 'toggle-left' if cat.is_active else 'toggle-right' }}"></i>
+              {{ 'Deactivate' if cat.is_active else 'Activate' }}
+            </button>
+          </form>
+        </div>
+        <i class="ti ti-chevron-down ad-cat-chevron"></i>
+      </div>
+      <div class="ad-subs">
+        <div class="ad-subs-title">Subcategories</div>
+        <div class="ad-subs-grid">
+          {% for sub in cat.subcategories.order_by('name').all() %}
+          <span class="ad-sub-tag">{{ sub.name }}</span>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  {% else %}
+    <div class="ad-empty">
+      <i class="ti ti-folder-off" style="font-size:32px;display:block;margin-bottom:12px;"></i>
+      No categories yet.
+      <br><br>
+      <a href="{{ url_for('admin.new_category') }}" class="ad-btn ad-btn-primary">Create the first category</a>
+    </div>
+  {% endif %}
+</div>
+
+<script>
+function toggleSubs(el) {
+  const card = el.closest('.ad-cat');
+  const subs = card.querySelector('.ad-subs');
+  const chevron = card.querySelector('.ad-cat-chevron');
+  subs.classList.toggle('open');
+  chevron.style.transform = subs.classList.contains('open') ? 'rotate(180deg)' : '';
+}
+</script>
 {% endblock %}

@@ -1,18 +1,65 @@
 {% extends "base.html" %}
 {% block title %}Earnings — GhanaServe Pro{% endblock %}
+{% block extra_css %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/portal.css') }}">
+{% endblock %}
 {% block content %}
-<h1>Earnings overview</h1>
-<p>Total earned: GH&#8373; {{ "%.2f"|format(total_earned) }}</p>
-<p>Disbursed: GH&#8373; {{ "%.2f"|format(disbursed) }}</p>
-<p>Pending payout: GH&#8373; {{ "%.2f"|format(pending) }}</p>
-<h2>Completed jobs</h2>
-{% if completed %}
-  {% for booking in completed %}
-    <div>
-      <p>{{ booking.quote.request.title }} &mdash; GH&#8373; {{ booking.pro_payout_amount }} &mdash; Payout: {{ booking.payout_status }} &mdash; {{ booking.completed_at.strftime('%d %b %Y') if booking.completed_at else '' }}</p>
+<div class="gd-page">
+  <div class="gd-page-header">
+    <div class="gd-page-title">Earnings</div>
+  </div>
+
+  <div class="gd-stats-row">
+    <div class="gd-stat-card">
+      <div class="gd-stat-num">GH&#8373; {{ "%.2f" | format(total_earned) }}</div>
+      <div class="gd-stat-label">Total Earned</div>
     </div>
-  {% endfor %}
-{% else %}
-  <p>No completed jobs yet.</p>
-{% endif %}
+    <div class="gd-stat-card">
+      <div class="gd-stat-num">GH&#8373; {{ "%.2f" | format(disbursed) }}</div>
+      <div class="gd-stat-label">Disbursed</div>
+    </div>
+    <div class="gd-stat-card">
+      <div class="gd-stat-num">GH&#8373; {{ "%.2f" | format(pending) }}</div>
+      <div class="gd-stat-label">Pending Payout</div>
+    </div>
+  </div>
+
+  <div class="gd-card">
+    <div class="gd-card-header">Completed jobs</div>
+    {% if completed %}
+    <table class="gd-table">
+      <thead>
+        <tr>
+          <th>Job</th>
+          <th>Payout</th>
+          <th>Status</th>
+          <th>Completed</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for booking in completed %}
+        <tr>
+          <td>{{ booking.quote.request.title }}</td>
+          <td>GH&#8373; {{ booking.pro_payout_amount }}</td>
+          <td>
+            <span class="gd-badge {% if booking.payout_status == 'disbursed' %}gd-badge--green{% elif booking.payout_status == 'pending' %}gd-badge--yellow{% else %}gd-badge--gray{% endif %}">
+              {{ booking.payout_status | title }}
+            </span>
+          </td>
+          <td>{{ booking.completed_at.strftime('%d %b %Y') if booking.completed_at else '—' }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <div class="gd-empty">
+      <div class="gd-empty-icon"><i class="ti ti-cash-off"></i></div>
+      <p>No completed jobs yet</p>
+      <div class="gd-empty-sub">Earnings will appear here after you complete bookings</div>
+    </div>
+    {% endif %}
+  </div>
+</div>
 {% endblock %}

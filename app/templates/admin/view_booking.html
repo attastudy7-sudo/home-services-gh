@@ -1,25 +1,87 @@
 {% extends "base.html" %}
 {% block title %}Booking Detail — Admin{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.30.0/dist/tabler-icons.min.css">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+{% endblock %}
+
 {% block content %}
-<h1>Booking: {{ booking.quote.request.title }}</h1>
-<p>Status: <strong>{{ booking.status }}</strong></p>
-<p>Customer: {{ booking.quote.request.customer.full_name }}</p>
-<p>Pro: {{ booking.quote.pro.business_name or booking.quote.pro.user.full_name }}</p>
-<p>Price: GH&#8373; {{ booking.agreed_price }} &mdash; Commission: GH&#8373; {{ booking.platform_commission }} &mdash; Pro payout: GH&#8373; {{ booking.pro_payout_amount }}</p>
-<p>Payout status: {{ booking.payout_status }}</p>
-<p>Payment: {{ booking.payment_method }} / {{ booking.payment_status }}</p>
-{% if booking.status == 'disputed' %}
-  <form method="POST" action="{{ url_for('admin.resolve_dispute', booking_id=booking.id) }}">
-    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-    <label>Resolve as:
-      <select name="resolution">
-        <option value="completed">Completed</option>
-        <option value="cancelled">Cancelled</option>
-      </select>
-    </label>
-    <input type="text" name="note" placeholder="Resolution note">
-    <button type="submit">Resolve dispute</button>
-  </form>
-{% endif %}
-<p><a href="{{ url_for('admin.list_bookings') }}">&larr; Back</a></p>
+<div class="ad-page">
+
+  <div class="ad-breadcrumb">
+    <a href="{{ url_for('admin.dashboard') }}">Dashboard</a> &rsaquo;
+    <a href="{{ url_for('admin.list_bookings') }}">Bookings</a> &rsaquo;
+    {{ booking.quote.request.title }}
+  </div>
+
+  <div class="ad-header">
+    <h1>{{ booking.quote.request.title }}</h1>
+  </div>
+
+  <div class="ad-detail">
+    <div class="ad-detail-grid">
+      <div class="ad-detail-field">
+        <div class="ad-detail-label">Status</div>
+        <div class="ad-detail-value">
+          <span class="ad-badge ad-badge--{{ booking.status }}">{{ booking.status }}</span>
+        </div>
+      </div>
+      <div class="ad-detail-field">
+        <div class="ad-detail-label">Customer</div>
+        <div class="ad-detail-value">{{ booking.quote.request.customer.full_name }}</div>
+      </div>
+      <div class="ad-detail-field">
+        <div class="ad-detail-label">Pro</div>
+        <div class="ad-detail-value">{{ booking.quote.pro.business_name or booking.quote.pro.user.full_name }}</div>
+      </div>
+      <div class="ad-detail-field">
+        <div class="ad-detail-label">Price</div>
+        <div class="ad-detail-value">GH&#8373; {{ booking.agreed_price }}</div>
+      </div>
+      <div class="ad-detail-field">
+        <div class="ad-detail-label">Commission</div>
+        <div class="ad-detail-value">GH&#8373; {{ booking.platform_commission }}</div>
+      </div>
+      <div class="ad-detail-field">
+        <div class="ad-detail-label">Pro payout</div>
+        <div class="ad-detail-value">GH&#8373; {{ booking.pro_payout_amount }}</div>
+      </div>
+      <div class="ad-detail-field">
+        <div class="ad-detail-label">Payout status</div>
+        <div class="ad-detail-value">
+          <span class="ad-badge ad-badge--{{ 'disbursed' if booking.payout_status == 'disbursed' else 'pending' }}">{{ booking.payout_status }}</span>
+        </div>
+      </div>
+      <div class="ad-detail-field">
+        <div class="ad-detail-label">Payment</div>
+        <div class="ad-detail-value">{{ booking.payment_method }} / {{ booking.payment_status }}</div>
+      </div>
+    </div>
+
+    {% if booking.status == 'disputed' %}
+    <div class="ad-detail-actions">
+      <form method="POST" action="{{ url_for('admin.resolve_dispute', booking_id=booking.id) }}" style="display:flex;flex-wrap:wrap;gap:10px;align-items:end;width:100%;">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div>
+          <div class="ad-form-label" style="margin-bottom:4px;">Resolve as</div>
+          <select name="resolution" class="ad-form-input" style="width:auto;padding:6px 32px 6px 10px;font-size:13px;">
+            <option value="completed">Completed</option>
+            <option value="cancelled">Cancelled</option>
+          </select>
+        </div>
+        <div>
+          <div class="ad-form-label" style="margin-bottom:4px;">Note</div>
+          <input type="text" name="note" class="ad-form-input" placeholder="Resolution note" style="width:auto;padding:6px 12px;font-size:13px;">
+        </div>
+        <button type="submit" class="ad-btn ad-btn-sm ad-btn-primary" style="align-self:flex-end;"><i class="ti ti-gavel"></i> Resolve dispute</button>
+      </form>
+    </div>
+    {% endif %}
+  </div>
+
+  <p style="margin-top:20px;">
+    <a href="{{ url_for('admin.list_bookings') }}" class="ad-btn ad-btn-outline">&larr; Back to bookings</a>
+  </p>
+
+</div>
 {% endblock %}

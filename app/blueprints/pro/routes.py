@@ -391,6 +391,11 @@ def onboarding_areas():
 
 @pro_bp.route('/<slug>')
 def public_profile(slug):
-    pro = ProProfile.query.filter_by(slug=slug, verification_status='approved').first_or_404()
+    from flask_login import current_user
+    pro = ProProfile.query.filter_by(slug=slug).first_or_404()
+    is_owner = current_user.is_authenticated and current_user.id == pro.user_id
+    is_admin = current_user.is_authenticated and current_user.is_admin
+    if pro.verification_status != 'approved' and not is_owner and not is_admin:
+        abort(404)
     reviews = Review.query.filter_by(reviewee_id=pro.user_id).order_by(Review.created_at.desc()).limit(10).all()
     return render_template('pro/public_profile.html', pro=pro, reviews=reviews)

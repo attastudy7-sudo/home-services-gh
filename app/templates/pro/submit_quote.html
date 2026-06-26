@@ -1,14 +1,42 @@
 {% extends "base.html" %}
 {% block title %}Submit Quote — GhanaServe{% endblock %}
+{% block extra_css %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/portal.css') }}">
+{% endblock %}
 {% block content %}
-<h1>Submit a quote</h1>
-<p>For: <strong>{{ req.title }}</strong></p>
-<form method="POST" action="{{ url_for('pro.submit_quote', request_id=req.id) }}">
-  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-  <p><label>Your price (GHS)<br><input type="number" name="amount" step="0.01" required></label></p>
-  <p><label>Message to customer<br><textarea name="message" rows="3" required placeholder="Describe your approach and why they should choose you"></textarea></label></p>
-  <p><label>Estimated hours<br><input type="number" name="estimated_hours"></label></p>
-  <p><label>Earliest available date<br><input type="date" name="available_date"></label></p>
-  <p><button type="submit">Submit quote</button></p>
-</form>
+<div class="gd-page">
+  <div class="gd-page-header">
+    <div>
+      <div class="gd-page-title">Submit a Quote</div>
+      <div class="gd-page-sub">For: {{ req.title }}</div>
+    </div>
+    <a href="{{ url_for('pro.view_lead', request_id=req.id) }}" class="gd-link">&larr; Back</a>
+  </div>
+  <div class="gd-card">
+    <form method="POST" action="{{ url_for('pro.submit_quote', request_id=req.id) }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <div class="gd-form-group">
+        <label class="gd-label" for="amount">Your price (GHS)</label>
+        <input class="gd-input" type="number" id="amount" name="amount" step="0.01" required placeholder="e.g. 250.00">
+      </div>
+      <div class="gd-form-group">
+        <label class="gd-label" for="message">Message to customer</label>
+        <textarea class="gd-textarea" id="message" name="message" required placeholder="Describe your approach and why they should choose you"></textarea>
+      </div>
+      <div class="gd-form-group">
+        <label class="gd-label" for="estimated_hours">Estimated hours (optional)</label>
+        <input class="gd-input" type="number" id="estimated_hours" name="estimated_hours" placeholder="e.g. 3">
+      </div>
+      <div class="gd-form-group">
+        <label class="gd-label" for="available_date">Earliest available date (optional)</label>
+        <input class="gd-input" type="date" id="available_date" name="available_date">
+      </div>
+      <div class="gd-actions">
+        <button type="submit" class="gd-btn"><i class="ti ti-send"></i> Submit quote</button>
+      </div>
+    </form>
+  </div>
+</div>
 {% endblock %}

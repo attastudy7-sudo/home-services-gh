@@ -1,11 +1,41 @@
 {% extends "base.html" %}
 {% block title %}New Category — Admin{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.30.0/dist/tabler-icons.min.css">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+{% endblock %}
+
 {% block content %}
-<h1>Add a new service category</h1>
-<form method="POST" action="{{ url_for('admin.new_category') }}">
-  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-  <p><label>Category name<br><input type="text" name="name" required></label></p>
-  <p><button type="submit">Create category</button></p>
-</form>
-<p><a href="{{ url_for('admin.list_categories') }}">&larr; Back</a></p>
+<div class="ad-page">
+
+  <div class="ad-breadcrumb">
+    <a href="{{ url_for('admin.dashboard') }}">Dashboard</a> &rsaquo;
+    <a href="{{ url_for('admin.list_categories') }}">Categories</a> &rsaquo;
+    New
+  </div>
+
+  <div class="ad-header">
+    <h1>Add a new service category</h1>
+  </div>
+
+  <div class="ad-detail" style="max-width:500px;">
+    <form method="POST" action="{{ url_for('admin.new_category') }}" class="ad-form">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+      <div class="ad-form-group">
+        <label class="ad-form-label" for="name">Category name</label>
+        <input type="text" id="name" name="name" class="ad-form-input" placeholder="e.g. Catering" required autofocus>
+        <div class="ad-form-hint">A slug will be auto-generated from the name.</div>
+      </div>
+
+      <div class="ad-form-actions">
+        <button type="submit" class="ad-btn ad-btn-primary">
+          <i class="ti ti-plus"></i> Create category
+        </button>
+        <a href="{{ url_for('admin.list_categories') }}" class="ad-btn ad-btn-outline">Cancel</a>
+      </div>
+    </form>
+  </div>
+
+</div>
 {% endblock %}

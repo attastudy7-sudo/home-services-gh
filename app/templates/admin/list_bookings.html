@@ -1,22 +1,62 @@
 {% extends "base.html" %}
 {% block title %}All Bookings — Admin{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.30.0/dist/tabler-icons.min.css">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+{% endblock %}
+
 {% block content %}
-<h1>All bookings</h1>
-{% for booking in bookings %}
-  <div>
-    <p>
-      <a href="{{ url_for('admin.view_booking', booking_id=booking.id) }}">{{ booking.quote.request.title }}</a>
-      &mdash; Status: {{ booking.status }}
-      &mdash; GH&#8373; {{ booking.agreed_price }}
-      &mdash; {{ booking.scheduled_date }}
-    </p>
+<div class="ad-page">
+
+  <div class="ad-breadcrumb">
+    <a href="{{ url_for('admin.dashboard') }}">Dashboard</a> &rsaquo; Bookings
   </div>
-{% endfor %}
-{% if pagination.pages > 1 %}
-  <p>
-    {% if pagination.has_prev %}<a href="{{ url_for('admin.list_bookings', page=pagination.prev_num) }}">&larr; Previous</a> {% endif %}
-    Page {{ pagination.page }} of {{ pagination.pages }}
-    {% if pagination.has_next %} <a href="{{ url_for('admin.list_bookings', page=pagination.next_num) }}">Next &rarr;</a>{% endif %}
-  </p>
-{% endif %}
+
+  <div class="ad-header">
+    <div>
+      <h1>All bookings</h1>
+      <div class="ad-header-sub">{{ pagination.total }} total</div>
+    </div>
+  </div>
+
+  <div class="ad-table-wrap">
+    <table class="ad-table">
+      <thead>
+        <tr>
+          <th>Service</th>
+          <th>Customer</th>
+          <th>Pro</th>
+          <th>Amount</th>
+          <th>Status</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for booking in bookings %}
+        <tr>
+          <td><a href="{{ url_for('admin.view_booking', booking_id=booking.id) }}">{{ booking.quote.request.title }}</a></td>
+          <td>{{ booking.quote.request.customer.full_name }}</td>
+          <td>{{ booking.quote.pro.business_name or booking.quote.pro.user.full_name }}</td>
+          <td>GH&#8373; {{ booking.agreed_price }}</td>
+          <td><span class="ad-badge ad-badge--{{ booking.status }}">{{ booking.status }}</span></td>
+          <td style="color:#6b7280;">{{ booking.scheduled_date }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    {% if pagination.pages > 1 %}
+    <div class="ad-pagination">
+      {% if pagination.has_prev %}
+        <a href="{{ url_for('admin.list_bookings', page=pagination.prev_num) }}"><i class="ti ti-chevron-left"></i> Previous</a>
+      {% endif %}
+      <span>Page {{ pagination.page }} of {{ pagination.pages }}</span>
+      {% if pagination.has_next %}
+        <a href="{{ url_for('admin.list_bookings', page=pagination.next_num) }}">Next <i class="ti ti-chevron-right"></i></a>
+      {% endif %}
+    </div>
+    {% endif %}
+  </div>
+
+</div>
 {% endblock %}

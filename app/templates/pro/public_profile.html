@@ -1,23 +1,481 @@
 {% extends "base.html" %}
 {% block title %}{{ pro.business_name or pro.user.full_name }} — GhanaServe{% endblock %}
+{% block extra_css %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.30.0/dist/tabler-icons.min.css">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+<style>
+.gp-page {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 24px 80px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  color: #1A1A2E;
+}
+
+/* ── HERO ── */
+.gp-hero {
+  display: flex;
+  align-items: flex-start;
+  gap: 28px;
+  margin-bottom: 40px;
+  padding-bottom: 32px;
+  border-bottom: 1px solid #f3f4f6;
+}
+.gp-avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 20px;
+  background: linear-gradient(135deg, #0F1F3D 0%, #1A7A4A 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30px;
+  font-weight: 700;
+  color: #fff;
+  flex-shrink: 0;
+  font-family: 'Sora', sans-serif;
+}
+.gp-hero-body { flex: 1; }
+.gp-hero-name {
+  font-family: 'Sora', sans-serif;
+  font-size: 28px;
+  font-weight: 700;
+  color: #0F1F3D;
+  margin: 0 0 4px;
+  letter-spacing: -0.4px;
+  line-height: 1.2;
+}
+.gp-hero-sub {
+  font-size: 14px;
+  color: #6b7280;
+  margin-bottom: 12px;
+}
+.gp-hero-stats {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+.gp-hero-stat {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 13px;
+  color: #374151;
+  font-weight: 500;
+}
+.gp-hero-stat .ti { color: #1A7A4A; font-size: 15px; }
+.gp-hero-stat strong { color: #0F1F3D; font-weight: 700; }
+
+.gp-hero-rate {
+  text-align: right;
+  flex-shrink: 0;
+}
+.gp-hero-rate-amount {
+  font-family: 'Sora', sans-serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: #1A7A4A;
+}
+.gp-hero-rate-label {
+  font-size: 12px;
+  color: #6b7280;
+  margin-top: 2px;
+}
+.gp-availability {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  margin-top: 8px;
+}
+.gp-availability--yes { background: #D1FAE5; color: #065F46; }
+.gp-availability--no { background: #FEE2E2; color: #991B1B; }
+
+/* ── CONTENT GRID ── */
+.gp-grid {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: 40px;
+}
+@media (max-width: 768px) {
+  .gp-grid { grid-template-columns: 1fr; }
+}
+
+.gp-section { margin-bottom: 32px; }
+.gp-section-title {
+  font-family: 'Sora', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: #0F1F3D;
+  margin: 0 0 14px;
+  letter-spacing: -0.2px;
+}
+
+/* ── BIO ── */
+.gp-bio {
+  font-size: 14px;
+  color: #374151;
+  line-height: 1.8;
+  margin: 0;
+}
+.gp-bio:empty { display: none; }
+
+/* ── TAGS ── */
+.gp-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.gp-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 500;
+  background: #f0fdf4;
+  color: #166534;
+}
+.gp-tag .ti { font-size: 13px; }
+
+/* ── INFO CARD (sidebar) ── */
+.gp-info-card {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  padding: 24px;
+}
+.gp-info-item {
+  display: flex;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid #f3f4f6;
+  font-size: 13px;
+  color: #374151;
+  line-height: 1.5;
+}
+.gp-info-item:first-child { padding-top: 0; }
+.gp-info-item:last-child { border-bottom: none; padding-bottom: 0; }
+.gp-info-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: #f0fdf4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #1A7A4A;
+  flex-shrink: 0;
+  font-size: 15px;
+}
+.gp-info-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #9ca3af;
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+.gp-info-value {
+  font-weight: 500;
+  color: #0F1F3D;
+}
+
+/* ── CTA ── */
+.gp-cta-wrap {
+  margin-top: 24px;
+}
+.gp-cta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 14px 24px;
+  background: #1A7A4A;
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 600;
+  font-family: inherit;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.gp-cta:hover { background: #15663e; }
+
+/* ── REVIEWS ── */
+.gp-review {
+  padding: 16px 0;
+  border-bottom: 1px solid #f3f4f6;
+}
+.gp-review:first-child { padding-top: 0; }
+.gp-review:last-child { border-bottom: none; padding-bottom: 0; }
+.gp-review-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+.gp-review-stars {
+  color: #f59e0b;
+  font-size: 14px;
+  letter-spacing: 1px;
+}
+.gp-review-date {
+  font-size: 12px;
+  color: #9ca3af;
+}
+.gp-review-comment {
+  font-size: 14px;
+  color: #374151;
+  line-height: 1.7;
+  margin: 0;
+}
+
+.gp-empty {
+  padding: 24px;
+  text-align: center;
+  background: #f9fafb;
+  border-radius: 12px;
+  color: #6b7280;
+  font-size: 13px;
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 768px) {
+  .gp-page { padding: 20px 16px 60px; }
+  .gp-hero {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 24px;
+    padding-bottom: 24px;
+    flex-wrap: wrap;
+  }
+  .gp-avatar {
+    width: 56px;
+    height: 56px;
+    font-size: 22px;
+    border-radius: 14px;
+  }
+  .gp-hero-body { min-width: 0; }
+  .gp-hero-name { font-size: 20px; letter-spacing: -0.3px; }
+  .gp-hero-sub { font-size: 13px; margin-bottom: 8px; }
+  .gp-hero-stats { gap: 12px; }
+  .gp-hero-stat { font-size: 12px; }
+  .gp-hero-rate {
+    width: 100%;
+    text-align: left;
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+  }
+  .gp-hero-rate-amount { font-size: 18px; }
+  .gp-hero-rate-label { margin-top: 0; }
+  .gp-availability { font-size: 11px; padding: 3px 10px; margin-top: 6px; }
+  .gp-grid { gap: 0; }
+  .gp-section { margin-bottom: 24px; }
+  .gp-section-title { font-size: 14px; margin-bottom: 10px; }
+  .gp-bio { font-size: 13px; line-height: 1.7; }
+  .gp-tag { font-size: 11px; padding: 4px 10px; }
+  .gp-info-card { border-radius: 12px; padding: 16px; }
+  .gp-info-item { padding: 10px 0; gap: 10px; font-size: 12px; }
+  .gp-info-icon { width: 28px; height: 28px; font-size: 13px; border-radius: 6px; }
+  .gp-info-label { font-size: 10px; }
+  .gp-cta-wrap { margin-top: 16px; }
+  .gp-cta { padding: 12px 20px; font-size: 14px; border-radius: 10px; }
+  .gp-review { padding: 12px 0; }
+  .gp-review-stars { font-size: 13px; }
+  .gp-review-comment { font-size: 13px; }
+  .gp-empty { padding: 16px; font-size: 12px; }
+}
+</style>
+{% endblock %}
+
 {% block content %}
-<h1>{{ pro.business_name or pro.user.full_name }}</h1>
-<p>Rating: {{ pro.avg_rating }}/5 ({{ pro.total_reviews }} reviews) &mdash; {{ pro.total_jobs }} jobs completed</p>
-<p>Experience: {{ pro.years_experience }} year(s)</p>
-<p>{{ pro.bio or 'No bio provided.' }}</p>
-{% if pro.base_hourly_rate %}
-  <p>Starting from GH&#8373; {{ pro.base_hourly_rate }}/hr</p>
-{% endif %}
-<p><a href="{{ url_for('customer.post_request') }}">Post a request to hire this pro</a></p>
-<h2>Reviews</h2>
-{% if reviews %}
-  {% for review in reviews %}
-    <div>
-      <p>{{ review.rating }}/5 &mdash; {{ review.comment or 'No comment.' }} &mdash; {{ review.created_at.strftime('%d %b %Y') }}</p>
+<div class="gp-page">
+
+  {% set names = (pro.business_name or pro.user.full_name).split() %}
+
+  <!-- HERO -->
+  <div class="gp-hero">
+    <div class="gp-avatar">{{ names[0][0] }}{{ names[1][0] if names|length > 1 else '' }}</div>
+    <div class="gp-hero-body">
+      <h1 class="gp-hero-name">{{ pro.business_name or pro.user.full_name }}</h1>
+      <div class="gp-hero-sub">
+        {% set cats = pro.categories.all() %}
+        {% if cats %}
+          {{ cats | map(attribute='category.name') | join(', ') }}
+        {% else %}
+          Service Professional
+        {% endif %}
+      </div>
+      <div class="gp-hero-stats">
+        <span class="gp-hero-stat">
+          <i class="ti ti-star-filled"></i>
+          <strong>{{ '%.1f'|format(pro.avg_rating) }}</strong>
+          ({{ pro.total_reviews }} review{{ 's' if pro.total_reviews != 1 }})
+        </span>
+        <span class="gp-hero-stat">
+          <i class="ti ti-briefcase"></i>
+          {{ pro.total_jobs }} job{{ 's' if pro.total_jobs != 1 }} completed
+        </span>
+        {% if pro.years_experience %}
+        <span class="gp-hero-stat">
+          <i class="ti ti-clock"></i>
+          {{ pro.years_experience }} year{{ 's' if pro.years_experience != 1 }} experience
+        </span>
+        {% endif %}
+      </div>
+      <div class="gp-availability gp-availability--{{ 'yes' if pro.is_available else 'no' }}">
+        <i class="ti ti-{{ 'circle-check' if pro.is_available else 'circle-x' }}"></i>
+        {{ 'Available for hire' if pro.is_available else 'Currently unavailable' }}
+      </div>
     </div>
-    <hr>
-  {% endfor %}
-{% else %}
-  <p>No reviews yet.</p>
-{% endif %}
+    {% if pro.base_hourly_rate %}
+    <div class="gp-hero-rate">
+      <div class="gp-hero-rate-amount">GH&#8373; {{ '%.0f'|format(pro.base_hourly_rate) }}</div>
+      <div class="gp-hero-rate-label">per hour</div>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- GRID -->
+  <div class="gp-grid">
+
+    <!-- MAIN COLUMN -->
+    <div>
+
+      {% if pro.bio %}
+      <div class="gp-section">
+        <h2 class="gp-section-title">About</h2>
+        <p class="gp-bio">{{ pro.bio }}</p>
+      </div>
+      {% endif %}
+
+      {% set subs = pro.subcategories.all() %}
+      {% if subs %}
+      <div class="gp-section">
+        <h2 class="gp-section-title">Services offered</h2>
+        <div class="gp-tags">
+          {% for ps in subs %}
+          <span class="gp-tag"><i class="ti ti-checks"></i> {{ ps.subcategory.name }}</span>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+
+      <div class="gp-section">
+        <h2 class="gp-section-title">
+          Reviews
+          {% if pro.total_reviews > 0 %}
+          <span style="font-family:'Inter',sans-serif;font-weight:400;font-size:13px;color:#6b7280;margin-left:6px;">
+            ({{ pro.total_reviews }})
+          </span>
+          {% endif %}
+        </h2>
+        {% if reviews %}
+          {% for review in reviews %}
+          <div class="gp-review">
+            <div class="gp-review-header">
+              <span class="gp-review-stars">
+                {% for i in range(5) %}
+                  {{ '★' if i < review.rating else '☆' }}
+                {% endfor %}
+              </span>
+              <span class="gp-review-date">{{ review.created_at.strftime('%d %b %Y') }}</span>
+            </div>
+            {% if review.comment %}
+            <p class="gp-review-comment">{{ review.comment }}</p>
+            {% endif %}
+          </div>
+          {% endfor %}
+        {% else %}
+          <div class="gp-empty">No reviews yet. Be the first to hire {{ pro.business_name or 'this pro' }}!</div>
+        {% endif %}
+      </div>
+
+    </div>
+
+    <!-- SIDEBAR -->
+    <div>
+
+      <div class="gp-info-card">
+
+        {% set areas = pro.service_areas.all() %}
+        {% if areas %}
+        <div class="gp-info-item">
+          <div class="gp-info-icon"><i class="ti ti-map-pin"></i></div>
+          <div>
+            <div class="gp-info-label">Service areas</div>
+            <div class="gp-info-value">
+              {% for sa in areas %}
+                {{ sa.location.area_name }}{% if not loop.last %}, {% endif %}
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+        {% endif %}
+
+        {% if cats %}
+        <div class="gp-info-item">
+          <div class="gp-info-icon"><i class="ti ti-category"></i></div>
+          <div>
+            <div class="gp-info-label">Categories</div>
+            <div class="gp-info-value">
+              {% for pc in cats %}
+                {{ pc.category.name }}{% if not loop.last %}, {% endif %}
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+        {% endif %}
+
+        {% if pro.years_experience %}
+        <div class="gp-info-item">
+          <div class="gp-info-icon"><i class="ti ti-clock"></i></div>
+          <div>
+            <div class="gp-info-label">Experience</div>
+            <div class="gp-info-value">{{ pro.years_experience }} year{{ 's' if pro.years_experience != 1 }}</div>
+          </div>
+        </div>
+        {% endif %}
+
+        {% if pro.verification_status == 'approved' %}
+        <div class="gp-info-item">
+          <div class="gp-info-icon"><i class="ti ti-shield-check"></i></div>
+          <div>
+            <div class="gp-info-label">Verification</div>
+            <div class="gp-info-value" style="color:#1A7A4A;">Verified</div>
+          </div>
+        </div>
+        {% endif %}
+
+        <div class="gp-info-item">
+          <div class="gp-info-icon"><i class="ti ti-calendar"></i></div>
+          <div>
+            <div class="gp-info-label">Member since</div>
+            <div class="gp-info-value">{{ pro.created_at.strftime('%b %Y') }}</div>
+          </div>
+        </div>
+
+        <div class="gp-cta-wrap">
+          <a href="{{ url_for('customer.post_request') }}" class="gp-cta">
+            <i class="ti ti-send"></i> Hire {{ names[0] }}
+          </a>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</div>
 {% endblock %}

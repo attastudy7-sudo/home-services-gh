@@ -1,24 +1,54 @@
 {% extends "base.html" %}
 {% block title %}Pending Pro Approvals — Admin{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.30.0/dist/tabler-icons.min.css">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+{% endblock %}
+
 {% block content %}
-<h1>Pending pro approvals ({{ pros|length }})</h1>
-{% if pros %}
-  {% for pro in pros %}
+<div class="ad-page">
+
+  <div class="ad-breadcrumb">
+    <a href="{{ url_for('admin.dashboard') }}">Dashboard</a> &rsaquo; Pending approvals
+  </div>
+
+  <div class="ad-header">
     <div>
-      <h3><a href="{{ url_for('admin.view_pro', pro_id=pro.id) }}">{{ pro.business_name or pro.user.full_name }}</a></h3>
-      <p>Applied: {{ pro.created_at.strftime('%d %b %Y') }} &mdash; Email: {{ pro.user.email }}</p>
-      <form method="POST" action="{{ url_for('admin.approve_pro', pro_id=pro.id) }}" class="d-inline">
-        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-        <button type="submit">Approve</button>
-      </form>
-      <form method="POST" action="{{ url_for('admin.reject_pro', pro_id=pro.id) }}" class="d-inline">
-        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-        <button type="submit">Reject</button>
-      </form>
+      <h1>Pending pro approvals</h1>
+      <div class="ad-header-sub">{{ pros|length }} pro{{ 's' if pros|length != 1 }} awaiting review</div>
     </div>
-    <hr>
-  {% endfor %}
-{% else %}
-  <p>No pending applications.</p>
-{% endif %}
+  </div>
+
+  {% if pros %}
+    {% for pro in pros %}
+    <div class="ad-list-item" style="border:1px solid #e5e7eb;border-radius:12px;margin-bottom:10px;padding:18px 20px;">
+      <div class="ad-list-body">
+        <div class="ad-list-title">
+          <a href="{{ url_for('admin.view_pro', pro_id=pro.id) }}">{{ pro.business_name or pro.user.full_name }}</a>
+        </div>
+        <div class="ad-list-meta">
+          {{ pro.user.email }} &middot; Applied {{ pro.created_at.strftime('%d %b %Y') }}
+        </div>
+      </div>
+      <div class="ad-list-actions">
+        <form method="POST" action="{{ url_for('admin.approve_pro', pro_id=pro.id) }}" style="display:inline">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button type="submit" class="ad-btn ad-btn-sm ad-btn-success"><i class="ti ti-circle-check"></i> Approve</button>
+        </form>
+        <form method="POST" action="{{ url_for('admin.reject_pro', pro_id=pro.id) }}" style="display:inline">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button type="submit" class="ad-btn ad-btn-sm ad-btn-danger"><i class="ti ti-circle-x"></i> Reject</button>
+        </form>
+      </div>
+    </div>
+    {% endfor %}
+  {% else %}
+    <div class="ad-empty">
+      <i class="ti ti-circle-check ad-empty-icon"></i>
+      <div class="ad-empty-text">No pending applications.</div>
+      <span style="font-size:13px;color:#6b7280;">All caught up!</span>
+    </div>
+  {% endif %}
+
+</div>
 {% endblock %}

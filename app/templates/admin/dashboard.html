@@ -1,17 +1,101 @@
 {% extends "base.html" %}
 {% block title %}Admin Dashboard — GhanaServe{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.30.0/dist/tabler-icons.min.css">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+<style>
+.ad-welcome {
+  font-size: 14px;
+  color: #6b7280;
+  margin-bottom: 24px;
+}
+.ad-welcome strong { color: #0F1F3D; }
+</style>
+{% endblock %}
+
 {% block content %}
-<h1>Admin dashboard</h1>
-<p>Pending pro approvals: <strong>{{ pending_pros }}</strong> &mdash; <a href="{{ url_for('admin.pending_pros') }}">Review now</a></p>
-<p>Total users: {{ total_users }}</p>
-<p>Active bookings: {{ active_bookings }}</p>
-<p>Stalled MoMo payments: <strong>{{ stalled_payments }}</strong> &mdash; <a href="{{ url_for('admin.stalled_momo') }}">View</a></p>
-<ul>
-  <li><a href="{{ url_for('admin.pending_pros') }}">Pending pro approvals</a></li>
-  <li><a href="{{ url_for('admin.list_users') }}">All users</a></li>
-  <li><a href="{{ url_for('admin.list_bookings') }}">All bookings</a></li>
-  <li><a href="{{ url_for('admin.list_payments') }}">All payments</a></li>
-  <li><a href="{{ url_for('admin.list_pending_payouts') }}">Pending payouts</a></li>
-  <li><a href="{{ url_for('admin.list_categories') }}">Manage categories</a></li>
-</ul>
+<div class="ad-page">
+
+  <div class="ad-header">
+    <div>
+      <h1>Admin dashboard</h1>
+      <div class="ad-header-sub">Overview of platform activity</div>
+    </div>
+  </div>
+
+  <div class="ad-stats">
+    <div class="ad-stat-card">
+      <div class="ad-stat-icon ad-stat-icon--green"><i class="ti ti-user-plus"></i></div>
+      <div class="ad-stat-value">{{ pending_pros }}</div>
+      <div class="ad-stat-label">Pending pro approvals</div>
+      {% if pending_pros > 0 %}
+      <a href="{{ url_for('admin.pending_pros') }}" style="font-size:12px;color:#1A7A4A;font-weight:600;display:inline-block;margin-top:6px;">Review now &rarr;</a>
+      {% endif %}
+    </div>
+    <div class="ad-stat-card">
+      <div class="ad-stat-icon ad-stat-icon--blue"><i class="ti ti-users"></i></div>
+      <div class="ad-stat-value">{{ total_users }}</div>
+      <div class="ad-stat-label">Total users</div>
+    </div>
+    <div class="ad-stat-card">
+      <div class="ad-stat-icon ad-stat-icon--amber"><i class="ti ti-calendar-check"></i></div>
+      <div class="ad-stat-value">{{ active_bookings }}</div>
+      <div class="ad-stat-label">Active bookings</div>
+    </div>
+    <div class="ad-stat-card">
+      <div class="ad-stat-icon ad-stat-icon--red"><i class="ti ti-alert-triangle"></i></div>
+      <div class="ad-stat-value">{{ stalled_payments }}</div>
+      <div class="ad-stat-label">Stalled MoMo payments</div>
+      {% if stalled_payments > 0 %}
+      <a href="{{ url_for('admin.stalled_momo') }}" style="font-size:12px;color:#dc2626;font-weight:600;display:inline-block;margin-top:6px;">View &rarr;</a>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="ad-nav-grid">
+    <a href="{{ url_for('admin.pending_pros') }}" class="ad-nav-card">
+      <div class="ad-nav-card-icon"><i class="ti ti-user-check"></i></div>
+      <div class="ad-nav-card-text">
+        <div class="ad-nav-card-title">Pending approvals</div>
+        <div class="ad-nav-card-count">{{ pending_pros }} awaiting review</div>
+      </div>
+    </a>
+    <a href="{{ url_for('admin.list_users') }}" class="ad-nav-card">
+      <div class="ad-nav-card-icon"><i class="ti ti-users"></i></div>
+      <div class="ad-nav-card-text">
+        <div class="ad-nav-card-title">All users</div>
+        <div class="ad-nav-card-count">{{ total_users }} total</div>
+      </div>
+    </a>
+    <a href="{{ url_for('admin.list_bookings') }}" class="ad-nav-card">
+      <div class="ad-nav-card-icon"><i class="ti ti-calendar-stats"></i></div>
+      <div class="ad-nav-card-text">
+        <div class="ad-nav-card-title">All bookings</div>
+        <div class="ad-nav-card-count">{{ active_bookings }} active</div>
+      </div>
+    </a>
+    <a href="{{ url_for('admin.list_payments') }}" class="ad-nav-card">
+      <div class="ad-nav-card-icon"><i class="ti ti-credit-card"></i></div>
+      <div class="ad-nav-card-text">
+        <div class="ad-nav-card-title">All payments</div>
+        <div class="ad-nav-card-count">Transaction history</div>
+      </div>
+    </a>
+    <a href="{{ url_for('admin.list_pending_payouts') }}" class="ad-nav-card">
+      <div class="ad-nav-card-icon"><i class="ti ti-cash"></i></div>
+      <div class="ad-nav-card-text">
+        <div class="ad-nav-card-title">Pending payouts</div>
+        <div class="ad-nav-card-count">Disburse to pros</div>
+      </div>
+    </a>
+    <a href="{{ url_for('admin.list_categories') }}" class="ad-nav-card">
+      <div class="ad-nav-card-icon"><i class="ti ti-category"></i></div>
+      <div class="ad-nav-card-text">
+        <div class="ad-nav-card-title">Manage categories</div>
+        <div class="ad-nav-card-count">Service categories</div>
+      </div>
+    </a>
+  </div>
+
+</div>
 {% endblock %}
