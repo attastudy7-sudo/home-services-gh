@@ -23,6 +23,7 @@ class ProProfile(db.Model):
     availability_note   = db.Column(db.String(255))
     base_hourly_rate    = db.Column(db.Numeric(10, 2))
     verified_at         = db.Column(db.DateTime)
+    approval_notified   = db.Column(db.Boolean, default=False)
     created_at          = db.Column(db.DateTime, server_default=db.func.now())
     updated_at          = db.Column(db.DateTime, server_default=db.func.now(), onupdate=db.func.now())
 
@@ -33,10 +34,11 @@ class ProProfile(db.Model):
         ),
     )
 
-    categories    = db.relationship('ProCategory', backref='pro', lazy='dynamic')
-    subcategories = db.relationship('ProSubcategory', backref='pro', lazy='dynamic')
-    service_areas = db.relationship('ProServiceArea', backref='pro', lazy='dynamic')
-    quotes        = db.relationship('Quote', backref='pro', lazy='dynamic')
+    categories       = db.relationship('ProCategory', backref='pro', lazy='dynamic')
+    subcategories    = db.relationship('ProSubcategory', backref='pro', lazy='dynamic')
+    service_areas    = db.relationship('ProServiceArea', backref='pro', lazy='dynamic')
+    quotes           = db.relationship('Quote', backref='pro', lazy='dynamic')
+    portfolio_images = db.relationship('ProPortfolioImage', backref='pro', lazy='dynamic', order_by='ProPortfolioImage.sort_order')
 
 
 class ProCategory(db.Model):
@@ -68,3 +70,14 @@ class ProServiceArea(db.Model):
     longitude         = db.Column(db.Float)
 
     location = db.relationship('LocationIndex')
+
+
+class ProPortfolioImage(db.Model):
+    __tablename__ = 'pro_portfolio_images'
+
+    id         = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    pro_id     = db.Column(UUID(as_uuid=True), db.ForeignKey('pro_profiles.id', ondelete='CASCADE'), nullable=False)
+    image_url  = db.Column(db.Text, nullable=False)
+    caption    = db.Column(db.String(255))
+    sort_order = db.Column(db.Integer, default=0)
+    created_at = db.Column(db.DateTime, server_default=db.func.now())

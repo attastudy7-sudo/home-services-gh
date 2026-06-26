@@ -34,7 +34,11 @@
       <div class="gs-nav-dropdown-trigger">
         {% if current_user.is_authenticated %}
         <button class="gs-nav-account-btn" aria-haspopup="true" aria-expanded="false">
+          {% if current_user.profile_photo_url %}
+          <img class="gs-nav-avatar" src="{{ current_user.profile_photo_url }}" alt="">
+          {% else %}
           <span class="gs-nav-avatar">{{ current_user.full_name[:1] }}</span>
+          {% endif %}
           {{ current_user.full_name.split()[0] }} <i class="ti ti-chevron-down"></i>
         </button>
         {% else %}

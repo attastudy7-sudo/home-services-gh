@@ -25,7 +25,17 @@
         <span style="font-size:1.25rem;font-weight:700;color:#1A7A4A;">GH&#8373; {{ quote.amount }}</span>
       </div>
       <div style="margin-bottom:0.75rem;">
-        <span class="gd-stars">{% for i in range(quote.pro.avg_rating | int) %}&#9733;{% endfor %}{% for i in range(5 - (quote.pro.avg_rating | int)) %}&#9734;{% endfor %}</span>
+        <span class="gd-stars">
+  {% for i in range(1, 6) %}
+    {% if quote.pro.avg_rating >= i %}
+    <i class="ti ti-star-filled"></i>
+    {% elif quote.pro.avg_rating >= i - 0.5 %}
+    <i class="ti ti-star-half-filled"></i>
+    {% else %}
+    <i class="ti ti-star"></i>
+    {% endif %}
+  {% endfor %}
+</span>
         <span style="font-size:0.8rem;color:#6B7280;margin-left:0.3rem;">{{ "%.1f" | format(quote.pro.avg_rating) }} ({{ quote.pro.total_reviews }} reviews)</span>
       </div>
       <p style="font-size:0.88rem;color:#374151;line-height:1.6;margin-bottom:0.75rem;">{{ quote.message | truncate(180) }}</p>

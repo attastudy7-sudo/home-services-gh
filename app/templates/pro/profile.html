@@ -22,7 +22,17 @@
       </span>
     </div>
     <div style="margin-bottom:0.75rem;">
-      <span class="gd-stars">{% for i in range(pro.avg_rating | int) %}&#9733;{% endfor %}{% for i in range(5 - (pro.avg_rating | int)) %}&#9734;{% endfor %}</span>
+      <span class="gd-stars">
+  {% for i in range(1, 6) %}
+    {% if pro.avg_rating >= i %}
+    <i class="ti ti-star-filled"></i>
+    {% elif pro.avg_rating >= i - 0.5 %}
+    <i class="ti ti-star-half-filled"></i>
+    {% else %}
+    <i class="ti ti-star"></i>
+    {% endif %}
+  {% endfor %}
+</span>
       <span style="font-size:0.8rem;color:#6B7280;margin-left:0.3rem;">{{ "%.1f" | format(pro.avg_rating) }} ({{ pro.total_reviews }} reviews) &middot; {{ pro.total_jobs }} jobs</span>
     </div>
     <div class="gd-detail-row">

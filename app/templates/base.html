@@ -35,7 +35,11 @@
       </div>
       <div class="gs-nav-dropdown-trigger">
         <button class="gs-nav-account-btn" aria-haspopup="true" aria-expanded="false">
+          {% if current_user.profile_photo_url %}
+          <img class="gs-nav-avatar" src="{{ current_user.profile_photo_url }}" alt="">
+          {% else %}
           <span class="gs-nav-avatar">{{ current_user.full_name[:1] }}</span>
+          {% endif %}
           {{ current_user.full_name.split()[0] }} <i class="ti ti-chevron-down"></i>
         </button>
         <div class="gs-nav-dropdown" role="menu">
@@ -68,10 +72,10 @@
         </div>
       </div>
     {% else %}
+      <a href="{{ url_for('auth.register_pro') }}" class="gs-btn-join">Join as a pro</a>
       <div class="gs-nav-icon" title="Cart">
         <i class="ti ti-shopping-cart" aria-hidden="true"></i>
       </div>
-      <a href="{{ url_for('auth.register_pro') }}" class="gs-btn-join">Join as a pro</a>
       <a href="{{ url_for('auth.login') }}" class="gs-nav-link">Login</a>
     {% endif %}
   </div>

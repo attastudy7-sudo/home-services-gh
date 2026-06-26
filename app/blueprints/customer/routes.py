@@ -172,16 +172,16 @@ def leave_review(booking_id):
         flash('You have already reviewed this booking.', 'info')
         return redirect(url_for('customer.view_booking', booking_id=booking.id))
     if request.method == 'POST':
+        pro = booking.quote.pro
         review = Review(
             booking_id=booking.id,
             reviewer_id=current_user.id,
-            reviewee_id=booking.pro_id,
+            reviewee_id=pro.user_id,
             rating=int(request.form.get('rating', 5)),
             comment=request.form.get('comment', '').strip()
         )
         db.session.add(review)
-        pro = booking.quote.pro
-        all_reviews = Review.query.filter_by(reviewee_id=booking.pro_id).all()
+        all_reviews = Review.query.filter_by(reviewee_id=pro.user_id).all()
         pro.avg_rating = round(sum(r.rating for r in all_reviews) / len(all_reviews), 2)
         pro.total_reviews = len(all_reviews)
         notify_review_received(pro.user_id, booking.id, current_user.full_name)

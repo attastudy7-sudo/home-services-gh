@@ -4,7 +4,7 @@ from werkzeug.utils import secure_filename
 from flask_login import login_required, current_user
 from app.blueprints.pro import pro_bp
 from app.extensions import db
-from app.models.pro import ProProfile, ProServiceArea, ProCategory, ProSubcategory
+from app.models.pro import ProProfile, ProServiceArea, ProCategory, ProSubcategory, ProPortfolioImage
 from app.models.marketplace import ServiceRequest, Quote, Booking
 from app.models.financial import Review, Payment
 from app.models.service import ServiceCategory, ServiceSubcategory
@@ -14,6 +14,7 @@ from app.notification_service import notify_new_quote, notify_booking_completed,
 from datetime import datetime
 from functools import wraps
 import re
+import uuid
 
 
 def pro_required(f):
@@ -38,6 +39,10 @@ def _allowed_file(filename):
 @pro_required
 def dashboard():
     pro = current_user.pro_profile
+    if pro.verification_status == 'approved' and not pro.approval_notified:
+        flash('Congratulations! Your pro profile has been approved. You can now receive service requests.', 'success')
+        pro.approval_notified = True
+        db.session.commit()
     open_leads = (ServiceRequest.query
         .join(ProServiceArea, ProServiceArea.location_index_id == ServiceRequest.location_index_id)
         .join(ProCategory, ProCategory.pro_id == pro.id)
@@ -253,7 +258,16 @@ def edit_profile():
             pro.slug = new_slug
         current_user.full_name = request.form.get('full_name', current_user.full_name).strip()
         current_user.phone = request.form.get('phone', current_user.phone).strip()
-        db.session.commit()
+        pro.bio = request.form.get('bio', '').strip()
+        pro.years_experience = int(request.form.get('years_experience', 0))
+        pro.availability_note = request.form.get('availability_note', '').strip()
+        pro.base_hourly_rate = coerce_money(request.form.get('base_hourly_rate'))
+        try:
+            db.session.commit()
+        except Exception:
+            db.session.rollback()
+            flash('Could not save profile. Please check your inputs and try again.', 'danger')
+            return redirect(url_for('pro.edit_profile'))
         flash('Profile updated.', 'success')
         return redirect(url_for('pro.profile'))
     return render_template('pro/edit_profile.html', pro=pro)
@@ -341,6 +355,45 @@ def toggle_availability():
     return redirect(url_for('pro.dashboard'))
 
 
+@pro_bp.route('/portfolio/upload', methods=['POST'])
+@login_required
+@pro_required
+def upload_portfolio_image():
+    pro = current_user.pro_profile
+    file = request.files.get('image')
+    caption = request.form.get('caption', '').strip()
+    if not file or file.filename == '':
+        flash('No file selected.', 'danger')
+        return redirect(url_for('pro.edit_profile'))
+    if not _allowed_file(file.filename):
+        flash('File type not allowed.', 'danger')
+        return redirect(url_for('pro.edit_profile'))
+    filename = secure_filename(f'portfolio_{pro.id}_{uuid.uuid4().hex}_{file.filename}')
+    upload_dir = os.path.join(current_app.root_path, 'static', 'uploads', 'portfolio')
+    os.makedirs(upload_dir, exist_ok=True)
+    filepath = os.path.join(upload_dir, filename)
+    file.save(filepath)
+    max_order = db.session.query(db.func.max(ProPortfolioImage.sort_order)).filter_by(pro_id=pro.id).scalar() or 0
+    img = ProPortfolioImage(pro_id=pro.id, image_url=f'/static/uploads/portfolio/{filename}', caption=caption, sort_order=max_order + 1)
+    db.session.add(img)
+    db.session.commit()
+    flash('Portfolio image added.', 'success')
+    return redirect(url_for('pro.edit_profile'))
+
+
+@pro_bp.route('/portfolio/<uuid:image_id>/delete', methods=['POST'])
+@login_required
+@pro_required
+def delete_portfolio_image(image_id):
+    img = ProPortfolioImage.query.get_or_404(image_id)
+    if img.pro_id != current_user.pro_profile.id:
+        abort(403)
+    db.session.delete(img)
+    db.session.commit()
+    flash('Portfolio image removed.', 'info')
+    return redirect(url_for('pro.edit_profile'))
+
+
 @pro_bp.route('/onboarding/services', methods=['GET', 'POST'])
 @login_required
 @pro_required
@@ -398,4 +451,5 @@ def public_profile(slug):
     if pro.verification_status != 'approved' and not is_owner and not is_admin:
         abort(404)
     reviews = Review.query.filter_by(reviewee_id=pro.user_id).order_by(Review.created_at.desc()).limit(10).all()
-    return render_template('pro/public_profile.html', pro=pro, reviews=reviews)
+    portfolio = pro.portfolio_images.all()
+    return render_template('pro/public_profile.html', pro=pro, reviews=reviews, portfolio=portfolio)

@@ -167,6 +167,7 @@ body {
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  object-fit: cover;
 }
 
 /* ── SEARCH BAR (browse page nav) ────────────────── */
@@ -602,17 +603,47 @@ body {
   .gs-nav-sub--active { display: none; }
   .gs-nav {
     padding: 0 1rem;
+    height: 64px;
+  }
+  .gs-nav-logo { font-size: 17px; }
+  .gs-nav-right { gap: 8px; }
+  .gs-nav-link {
+    font-size: 13px;
+    padding: 6px 8px;
+  }
+  .gs-btn-join {
+    font-size: 13px;
+    padding: 6px 16px;
+  }
+  .gs-nav-icon {
+    width: 34px;
+    height: 34px;
+    font-size: 15px;
+  }
+  .gs-nav-account-btn {
+    font-size: 13px;
+    padding: 4px 12px 4px 4px;
+  }
+  .gs-nav-avatar {
+    width: 26px;
+    height: 26px;
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .gs-nav {
+    padding: 0 0.75rem;
     height: 60px;
   }
   .gs-nav-logo { font-size: 16px; }
-  .gs-nav-right { gap: 6px; }
+  .gs-btn-join {
+    font-size: 12px;
+    padding: 5px 12px;
+  }
   .gs-nav-link {
     font-size: 12px;
     padding: 4px 6px;
-  }
-  .gs-btn-join {
-    font-size: 12px;
-    padding: 5px 14px;
   }
   .gs-nav-icon {
     width: 32px;
@@ -623,36 +654,4 @@ body {
     font-size: 12px;
     padding: 3px 10px 3px 3px;
   }
-  .gs-nav-avatar {
-    width: 24px;
-    height: 24px;
-    font-size: 11px;
-  }
-}
-
-@media (max-width: 480px) {
-  .gs-nav {
-    padding: 0 0.75rem;
-    height: 54px;
-  }
-  .gs-nav-logo { font-size: 14px; }
-  .gs-btn-join {
-    font-size: 10px;
-    padding: 4px 10px;
-    border-width: 1px;
-  }
-  .gs-nav-link {
-    font-size: 10px;
-    padding: 3px 4px;
-  }
-  .gs-nav-icon {
-    width: 28px;
-    height: 28px;
-    font-size: 12px;
-  }
-  .gs-nav-account-btn {
-    font-size: 10px;
-    padding: 2px 8px 2px 2px;
-  }
-  .gs-nav-account-btn span { display: none; }
 }

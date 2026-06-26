@@ -16,6 +16,8 @@ def login():
         user = User.query.filter_by(email=request.form.get('email')).first()
         if user and user.check_password(request.form.get('password')) and user.is_active:
             login_user(user)
+            if user.is_pro and user.pro_profile and user.pro_profile.verification_status != 'approved':
+                flash('Your pro profile is pending approval. You will be notified once verified.', 'warning')
             next_page = request.args.get('next')
             return redirect(next_page or url_for('index'))
         flash('Invalid email or password.', 'danger')
@@ -86,8 +88,8 @@ def register_pro():
         db.session.add(pro)
         db.session.commit()
         login_user(user)
-        flash('Pro account created. Your profile is pending admin approval.', 'info')
-        return redirect(url_for('pro.dashboard'))
+        flash('Pro account created! Set up your services and areas to start receiving leads.', 'success')
+        return redirect(url_for('pro.onboarding_services'))
     return render_template('auth/register_pro.html')
 
 

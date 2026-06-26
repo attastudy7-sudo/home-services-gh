@@ -12,22 +12,23 @@
       <div class="gd-page-title">{{ pro.business_name or current_user.full_name }}</div>
       <div class="gd-page-sub">Pro Dashboard</div>
     </div>
-    <form method="POST" action="{{ url_for('pro.toggle_availability') }}">
-      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-      <button type="submit" class="gd-btn {{ 'gd-btn--ghost' if pro.is_available else '' }}">
-        <i class="ti {{ 'ti-toggle-right' if pro.is_available else 'ti-toggle-left' }}"></i>
-        {{ 'Available' if pro.is_available else 'Unavailable' }}
-      </button>
-    </form>
+    <div class="gd-header-actions">
+      {% if pro.verification_status == 'approved' %}
+      <span class="gd-status-tab gd-status-tab--approved"><i class="ti ti-circle-check"></i> Approved</span>
+      {% elif pro.verification_status == 'pending' %}
+      <span class="gd-status-tab gd-status-tab--pending"><i class="ti ti-clock"></i> Pending</span>
+      {% elif pro.verification_status in ('rejected', 'suspended') %}
+      <span class="gd-status-tab gd-status-tab--rejected"><i class="ti ti-alert-circle"></i> {{ pro.verification_status | title }}</span>
+      {% endif %}
+      <form method="POST" action="{{ url_for('pro.toggle_availability') }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button type="submit" class="gd-btn {{ 'gd-btn--ghost' if pro.is_available else '' }}">
+          <i class="ti {{ 'ti-toggle-right' if pro.is_available else 'ti-toggle-left' }}"></i>
+          {{ 'Available' if pro.is_available else 'Unavailable' }}
+        </button>
+      </form>
+    </div>
   </div>
-
-  {% if pro.verification_status == 'pending' %}
-  <div class="gd-alert gd-alert--warning"><i class="ti ti-clock"></i> Your profile is under review. You will be notified once approved.</div>
-  {% elif pro.verification_status == 'approved' %}
-  <div class="gd-alert gd-alert--success"><i class="ti ti-circle-check"></i> Your profile is approved. You can receive service requests.</div>
-  {% elif pro.verification_status in ('rejected', 'suspended') %}
-  <div class="gd-alert gd-alert--danger"><i class="ti ti-alert-circle"></i> Your profile has been {{ pro.verification_status }}. Contact support for details.</div>
-  {% endif %}
 
   <div class="gd-stats-row">
     <div class="gd-stat-card">

@@ -249,6 +249,51 @@
   font-size: 13px;
 }
 
+/* ── REVIEWS SEE MORE ── */
+.gp-reviews-wrap { position: relative; }
+.gp-reviews-list { display: flex; flex-direction: column; }
+.gp-reviews-list.collapsed .gp-review:nth-child(n+4) { display: none; }
+.gp-reviews-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 12px;
+  padding: 8px 16px;
+  background: none;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 50px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #374151;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.gp-reviews-toggle:hover { background: #f1f5f9; }
+
+/* ── PORTFOLIO GALLERY ── */
+.gp-portfolio-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+.gp-portfolio-item {
+  aspect-ratio: 4 / 3;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #f3f4f6;
+}
+.gp-portfolio-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+@media (max-width: 768px) {
+  .gp-portfolio-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+}
+
 /* ── RESPONSIVE ── */
 @media (max-width: 768px) {
   .gp-page { padding: 20px 16px 60px; }
@@ -320,7 +365,17 @@
       </div>
       <div class="gp-hero-stats">
         <span class="gp-hero-stat">
-          <i class="ti ti-star-filled"></i>
+          <span style="display:flex;gap:2px;margin-right:2px;">
+            {% for i in range(1, 6) %}
+              {% if pro.avg_rating >= i %}
+              <i class="ti ti-star-filled" style="color:#FCD116;font-size:15px;"></i>
+              {% elif pro.avg_rating >= i - 0.5 %}
+              <i class="ti ti-star-half-filled" style="color:#FCD116;font-size:15px;"></i>
+              {% else %}
+              <i class="ti ti-star" style="color:#e2e8f0;font-size:15px;"></i>
+              {% endif %}
+            {% endfor %}
+          </span>
           <strong>{{ '%.1f'|format(pro.avg_rating) }}</strong>
           ({{ pro.total_reviews }} review{{ 's' if pro.total_reviews != 1 }})
         </span>
@@ -383,25 +438,50 @@
           {% endif %}
         </h2>
         {% if reviews %}
-          {% for review in reviews %}
-          <div class="gp-review">
-            <div class="gp-review-header">
-              <span class="gp-review-stars">
-                {% for i in range(5) %}
-                  {{ '★' if i < review.rating else '☆' }}
-                {% endfor %}
-              </span>
-              <span class="gp-review-date">{{ review.created_at.strftime('%d %b %Y') }}</span>
+        <div class="gp-reviews-wrap">
+          <div class="gp-reviews-list collapsed" id="gp-reviews-list">
+            {% for review in reviews %}
+            <div class="gp-review">
+              <div class="gp-review-header">
+                <span class="gp-review-stars">
+                  {% for i in range(5) %}
+                    {{ '★' if i < review.rating else '☆' }}
+                  {% endfor %}
+                </span>
+                <span class="gp-review-date">{{ review.created_at.strftime('%d %b %Y') }}</span>
+              </div>
+              {% if review.comment %}
+              <p class="gp-review-comment">{{ review.comment }}</p>
+              {% endif %}
             </div>
-            {% if review.comment %}
-            <p class="gp-review-comment">{{ review.comment }}</p>
-            {% endif %}
+            {% endfor %}
           </div>
-          {% endfor %}
+          {% if reviews|length > 3 %}
+          <button class="gp-reviews-toggle" id="gp-reviews-toggle" onclick="(function(){
+            var list = document.getElementById('gp-reviews-list');
+            var btn = document.getElementById('gp-reviews-toggle');
+            var expanded = list.classList.toggle('collapsed');
+            btn.textContent = expanded ? 'See all {{ pro.total_reviews }} reviews' : 'Show less';
+          })()">See all {{ pro.total_reviews }} reviews</button>
+          {% endif %}
+        </div>
         {% else %}
           <div class="gp-empty">No reviews yet. Be the first to hire {{ pro.business_name or 'this pro' }}!</div>
         {% endif %}
       </div>
+
+      {% if portfolio %}
+      <div class="gp-section">
+        <h2 class="gp-section-title">Previous engagements</h2>
+        <div class="gp-portfolio-grid">
+          {% for img in portfolio %}
+          <div class="gp-portfolio-item">
+            <img src="{{ img.image_url }}" alt="{{ img.caption or 'Portfolio image' }}" loading="lazy">
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
 
     </div>
 

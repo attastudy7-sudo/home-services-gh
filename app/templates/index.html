@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+﻿{% extends 'base.html' %}
 
 {% block extra_css %}
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -45,11 +45,32 @@
       </div>
     </div>
 
+    <div class="gs-quick-pills">
+      <a href="{{ url_for('category_in_city', city_slug='accra', category_slug='plumbing') }}" class="gs-quick-pill" data-cat-slug="plumbing">
+        <i class="ti ti-droplet"></i> Plumber in Accra
+      </a>
+      <a href="{{ url_for('category_in_city', city_slug='accra', category_slug='ac-appliances') }}" class="gs-quick-pill" data-cat-slug="ac-appliances">
+        <i class="ti ti-air-conditioning"></i> AC Repair in Accra
+      </a>
+      <a href="{{ url_for('category_in_city', city_slug='accra', category_slug='painting') }}" class="gs-quick-pill" data-cat-slug="painting">
+        <i class="ti ti-paint"></i> Painter in Accra
+      </a>
+      <a href="{{ url_for('category_in_city', city_slug='accra', category_slug='cleaning-pest') }}" class="gs-quick-pill" data-cat-slug="cleaning-pest">
+        <i class="ti ti-sparkles"></i> Cleaning in Accra
+      </a>
+      <a href="{{ url_for('category_in_city', city_slug='accra', category_slug='carpentry-furniture') }}" class="gs-quick-pill" data-cat-slug="carpentry-furniture">
+        <i class="ti ti-armchair"></i> Carpenter in Accra
+      </a>
+      <a href="{{ url_for('category_in_city', city_slug='accra', category_slug='electrical') }}" class="gs-quick-pill" data-cat-slug="electrical">
+        <i class="ti ti-bolt"></i> Electrician in Accra
+      </a>
+    </div>
+
   </section>
 
-  <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+  <!-- ════════════════════════════════════════════════════════════════
        SECTION 1: CATEGORY SCROLL ROW
-       â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+       ════════════════════════════════════════════════════════════════ -->
   <section class="gs-cats">
     <div class="gs-cats-scroll">
 
@@ -86,30 +107,148 @@
     </div>
   </section>
 
-  <div class="gs-quick-pills">
-    <a href="{{ url_for('category_in_city', city_slug='accra', category_slug='plumbing') }}" class="gs-quick-pill" data-cat-slug="plumbing">
-      <i class="ti ti-droplet"></i> Plumber in Accra
-    </a>
-    <a href="{{ url_for('category_in_city', city_slug='accra', category_slug='ac-appliances') }}" class="gs-quick-pill" data-cat-slug="ac-appliances">
-      <i class="ti ti-air-conditioning"></i> AC Repair in Accra
-    </a>
-    <a href="{{ url_for('category_in_city', city_slug='accra', category_slug='painting') }}" class="gs-quick-pill" data-cat-slug="painting">
-      <i class="ti ti-paint"></i> Painter in Accra
-    </a>
-    <a href="{{ url_for('category_in_city', city_slug='accra', category_slug='cleaning-pest') }}" class="gs-quick-pill" data-cat-slug="cleaning-pest">
-      <i class="ti ti-sparkles"></i> Cleaning in Accra
-    </a>
-    <a href="{{ url_for('category_in_city', city_slug='accra', category_slug='carpentry-furniture') }}" class="gs-quick-pill" data-cat-slug="carpentry-furniture">
-      <i class="ti ti-armchair"></i> Carpenter in Accra
-    </a>
-    <a href="{{ url_for('category_in_city', city_slug='accra', category_slug='electrical') }}" class="gs-quick-pill" data-cat-slug="electrical">
-      <i class="ti ti-bolt"></i> Electrician in Accra
-    </a>
-  </div>
-
   </div><!-- /.gs-above-fold -->
 
   <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+       WHY CHOOSE GHANASERVE
+       â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+  <section class="gs-why">
+    <div class="gs-why-inner">
+
+      <div class="gs-why-left">
+        <h2 class="gs-why-title">Why choose GhanaServe?</h2>
+        <p class="gs-why-sub">
+          Find the best professionals in Accra, whatever your need.
+        </p>
+
+        <ul class="gs-why-list">
+
+          <li class="gs-why-item">
+            <div class="gs-why-item-left">
+              <div class="gs-why-circle">
+                <i class="ti ti-shield-check" aria-hidden="true"></i>
+              </div>
+              <div class="gs-why-dash" aria-hidden="true"></div>
+            </div>
+            <div class="gs-why-body">
+              <h3>Verified &amp; vetted professionals</h3>
+              <p>Every pro is background-checked and reviewed by real
+              customers before they appear on the platform.</p>
+            </div>
+          </li>
+
+          <li class="gs-why-item">
+            <div class="gs-why-item-left">
+              <div class="gs-why-circle">
+                <i class="ti ti-adjustments-horizontal" aria-hidden="true"></i>
+              </div>
+              <div class="gs-why-dash" aria-hidden="true"></div>
+            </div>
+            <div class="gs-why-body">
+              <h3>Matched to your needs</h3>
+              <p>Pros compete for your job — you pick the right one based
+              on quotes, ratings, and experience.</p>
+            </div>
+          </li>
+
+          <li class="gs-why-item">
+            <div class="gs-why-item-left">
+              <div class="gs-why-circle">
+                <i class="ti ti-headset" aria-hidden="true"></i>
+              </div>
+            </div>
+            <div class="gs-why-body">
+              <h3>Support at every step</h3>
+              <p>Smooth connections and support for both customers and
+              professionals throughout every booking.</p>
+            </div>
+          </li>
+
+        </ul>
+      </div>
+
+      <div class="gs-why-right">
+        <div class="gs-why-photo">
+          <div class="gs-why-slides">
+            <img src="{{ url_for('static', filename='img/.gs-why-photo-placeholder (1).jpg') }}" alt="" aria-hidden="true" class="gs-why-slide gs-why-slide--1">
+            <img src="{{ url_for('static', filename='img/.gs-why-photo-placeholder (2).jpg') }}" alt="" aria-hidden="true" class="gs-why-slide gs-why-slide--2">
+            <img src="{{ url_for('static', filename='img/.gs-why-photo-placeholder (3).jpg') }}" alt="" aria-hidden="true" class="gs-why-slide gs-why-slide--3">
+          </div>
+        </div>
+        <div class="gs-why-stats">
+          <div class="gs-why-stat">
+            <span class="gs-stat-num">500+</span>
+            <span class="gs-stat-label">Verified Pros</span>
+          </div>
+          <div class="gs-why-stat">
+            <span class="gs-stat-num">21</span>
+            <span class="gs-stat-label">Areas in Accra</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+       HOW IT WORKS
+       â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+  <section class="gs-how">
+    <div class="gs-how-inner">
+
+      <div class="gs-how-header">
+        <h2 class="gs-how-title">How GhanaServe works</h2>
+        <p class="gs-how-sub">Three steps from problem to solved.</p>
+      </div>
+
+      <div class="gs-how-steps">
+
+        <div class="gs-how-track">
+          <div class="gs-how-track-line " aria-hidden="true"></div>
+          <div class="gs-how-track-line2" aria-hidden="true"></div>
+          <div class="gs-how-circle-row">
+            <div class="gs-how-num">1</div>
+            <div class="gs-how-num">2</div>
+            <div class="gs-how-num">3</div>
+          </div>
+        </div>
+
+        <div class="gs-how-labels">
+
+          <div class="gs-how-label" data-step="1">
+            <h3 class="gs-how-step-title">Post your job</h3>
+            <p class="gs-how-step-body">Describe what you need, your
+            area in Accra, and your preferred date. Takes under
+            2 minutes.</p>
+          </div>
+
+          <div class="gs-how-label" data-step="2">
+            <h3 class="gs-how-step-title">Receive quotes</h3>
+            <p class="gs-how-step-body">Verified professionals in your
+            area respond with quotes. Compare ratings, experience,
+            and prices.</p>
+          </div>
+
+          <div class="gs-how-label" data-step="3">
+            <h3 class="gs-how-step-title">Hire and pay</h3>
+            <p class="gs-how-step-body">Accept the quote you like,
+            confirm the booking, and pay securely via MoMo or card
+            when the job is done.</p>
+          </div>
+
+        </div>
+
+      </div>
+
+      <div class="gs-how-cta-wrap">
+        <a href="{{ url_for('customer.post_request') }}" class="gs-how-cta">
+          Post a job now
+        </a>
+      </div>
+
+    </div>
+  </section>
+<!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
        POPULAR SERVICES BANNER
        â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
   <section class="gs-popular">
@@ -194,145 +333,7 @@
     </div>
   </section>
 
-  <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-       SECTION 2: HOW IT WORKS
-       â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
-  <section class="gs-how">
-    <div class="gs-how-inner">
-
-      <div class="gs-how-header">
-        <h2 class="gs-how-title">How GhanaServe works</h2>
-        <p class="gs-how-sub">Three steps from problem to solved.</p>
-      </div>
-
-      <div class="gs-how-steps">
-
-        <div class="gs-how-track">
-          <div class="gs-how-track-line " aria-hidden="true"></div>
-          <div class="gs-how-track-line2" aria-hidden="true"></div>
-          <div class="gs-how-circle-row">
-            <div class="gs-how-num">1</div>
-            <div class="gs-how-num">2</div>
-            <div class="gs-how-num">3</div>
-          </div>
-        </div>
-
-        <div class="gs-how-labels">
-
-          <div class="gs-how-label" data-step="1">
-            <h3 class="gs-how-step-title">Post your job</h3>
-            <p class="gs-how-step-body">Describe what you need, your
-            area in Accra, and your preferred date. Takes under
-            2 minutes.</p>
-          </div>
-
-          <div class="gs-how-label" data-step="2">
-            <h3 class="gs-how-step-title">Receive quotes</h3>
-            <p class="gs-how-step-body">Verified professionals in your
-            area respond with quotes. Compare ratings, experience,
-            and prices.</p>
-          </div>
-
-          <div class="gs-how-label" data-step="3">
-            <h3 class="gs-how-step-title">Hire and pay</h3>
-            <p class="gs-how-step-body">Accept the quote you like,
-            confirm the booking, and pay securely via MoMo or card
-            when the job is done.</p>
-          </div>
-
-        </div>
-
-      </div>
-
-      <div class="gs-how-cta-wrap">
-        <a href="{{ url_for('customer.post_request') }}" class="gs-how-cta">
-          Post a job now
-        </a>
-      </div>
-
-    </div>
-  </section>
-
-  <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-       SECTION 3: WHY CHOOSE GHANASERVE
-       â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
-  <section class="gs-why">
-    <div class="gs-why-inner">
-
-      <div class="gs-why-left">
-        <h2 class="gs-why-title">Why choose GhanaServe?</h2>
-        <p class="gs-why-sub">
-          Find the best professionals in Accra, whatever your need.
-        </p>
-
-        <ul class="gs-why-list">
-
-          <li class="gs-why-item">
-            <div class="gs-why-item-left">
-              <div class="gs-why-circle">
-                <i class="ti ti-shield-check" aria-hidden="true"></i>
-              </div>
-              <div class="gs-why-dash" aria-hidden="true"></div>
-            </div>
-            <div class="gs-why-body">
-              <h3>Verified &amp; vetted professionals</h3>
-              <p>Every pro is background-checked and reviewed by real
-              customers before they appear on the platform.</p>
-            </div>
-          </li>
-
-          <li class="gs-why-item">
-            <div class="gs-why-item-left">
-              <div class="gs-why-circle">
-                <i class="ti ti-adjustments-horizontal" aria-hidden="true"></i>
-              </div>
-              <div class="gs-why-dash" aria-hidden="true"></div>
-            </div>
-            <div class="gs-why-body">
-              <h3>Matched to your needs</h3>
-              <p>Pros compete for your job — you pick the right one based
-              on quotes, ratings, and experience.</p>
-            </div>
-          </li>
-
-          <li class="gs-why-item">
-            <div class="gs-why-item-left">
-              <div class="gs-why-circle">
-                <i class="ti ti-headset" aria-hidden="true"></i>
-              </div>
-            </div>
-            <div class="gs-why-body">
-              <h3>Support at every step</h3>
-              <p>Smooth connections and support for both customers and
-              professionals throughout every booking.</p>
-            </div>
-          </li>
-
-        </ul>
-      </div>
-
-      <div class="gs-why-right">
-        <div class="gs-why-photo">
-          <div class="gs-why-slides">
-            <img src="{{ url_for('static', filename='img/.gs-why-photo-placeholder (1).jpg') }}" alt="" aria-hidden="true" class="gs-why-slide gs-why-slide--1">
-            <img src="{{ url_for('static', filename='img/.gs-why-photo-placeholder (2).jpg') }}" alt="" aria-hidden="true" class="gs-why-slide gs-why-slide--2">
-            <img src="{{ url_for('static', filename='img/.gs-why-photo-placeholder (3).jpg') }}" alt="" aria-hidden="true" class="gs-why-slide gs-why-slide--3">
-          </div>
-        </div>
-        <div class="gs-why-stats">
-          <div class="gs-why-stat">
-            <span class="gs-stat-num">500+</span>
-            <span class="gs-stat-label">Verified Pros</span>
-          </div>
-          <div class="gs-why-stat">
-            <span class="gs-stat-num">21</span>
-            <span class="gs-stat-label">Areas in Accra</span>
-          </div>
-        </div>
-      </div>
-
-    </div>
-  </section>
+  
 
   <!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
        SECTION 4: TRUST BAR

@@ -59,5 +59,38 @@
       </div>
     </form>
   </div>
+
+  {% set portfolio = pro.portfolio_images.all() %}
+  <div class="gd-card" style="margin-top:1.5rem;">
+    <div class="gd-card-header">Portfolio images</div>
+    <p style="font-size:0.85rem;color:#6B7280;margin-bottom:1rem;">Upload photos of your previous work to show customers.</p>
+    {% if portfolio %}
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px;margin-bottom:1.5rem;">
+      {% for img in portfolio %}
+      <div style="position:relative;border-radius:8px;overflow:hidden;aspect-ratio:4/3;background:#f3f4f6;">
+        <img src="{{ img.image_url }}" alt="{{ img.caption or '' }}" style="width:100%;height:100%;object-fit:cover;display:block;">
+        <form method="POST" action="{{ url_for('pro.delete_portfolio_image', image_id=img.id) }}" style="position:absolute;top:4px;right:4px;">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button type="submit" style="width:24px;height:24px;border-radius:50%;border:none;background:rgba(0,0,0,0.5);color:#fff;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;" title="Remove">&times;</button>
+        </form>
+        {% if img.caption %}
+        <div style="position:absolute;bottom:0;left:0;right:0;padding:4px 6px;background:rgba(0,0,0,0.4);color:#fff;font-size:10px;">{{ img.caption }}</div>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+    <form method="POST" action="{{ url_for('pro.upload_portfolio_image') }}" enctype="multipart/form-data">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <div class="gd-upload-section">
+        <div class="gd-upload-label">Add a photo</div>
+        <input type="file" name="image" accept="image/*" required>
+      </div>
+      <div class="gd-form-group">
+        <input class="gd-input" type="text" name="caption" placeholder="Short caption (e.g. Kitchen renovation in Accra)" style="margin-top:0.5rem;">
+      </div>
+      <button type="submit" class="gd-btn" style="margin-top:0.5rem;">Upload</button>
+    </form>
+  </div>
 </div>
 {% endblock %}

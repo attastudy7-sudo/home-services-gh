@@ -18,6 +18,8 @@ from app.models.user import User
 from app.models.pro import ProProfile, ProCategory, ProSubcategory, ProServiceArea as ProServiceAreaModel
 from app.models.service import ServiceCategory, ServiceSubcategory
 from app.models.location import LocationIndex
+from app.models.financial import Review
+import random
 
 app = create_app()
 
@@ -118,8 +120,8 @@ with app.app_context():
             base_hourly_rate=p["rate"],
             verification_status="approved",
             is_available=True,
-            avg_rating=round(3.5 + (hash(p["name"]) % 15) / 10, 1),
-            total_reviews=hash(p["name"]) % 30 + 3,
+            avg_rating=0.0,
+            total_reviews=0,
             total_jobs=hash(p["name"]) % 50 + 10,
         )
         db.session.add(pro)
@@ -138,6 +140,25 @@ with app.app_context():
 
         for aid in area_ids:
             db.session.add(ProServiceAreaModel(pro_id=pro.id, location_index_id=aid, radius_km=10))
+
+        num_reviews = hash(p["name"]) % 25 + 3
+        for r in range(num_reviews):
+            db.session.add(Review(
+                reviewer_id=random.choice([u.id for u in User.query.filter(User.id != user.id).all()]),
+                reviewee_id=user.id,
+                rating=random.randint(3, 5),
+                comment=random.choice([
+                    "Excellent work, very professional!",
+                    "Did a great job, would recommend.",
+                    "Good service, on time and friendly.",
+                    "Decent work, reasonable price.",
+                    "Very skilled and careful. Highly recommend.",
+                ]),
+            ))
+        db.session.flush()
+        all_pro_reviews = Review.query.filter_by(reviewee_id=user.id).all()
+        pro.avg_rating = round(sum(r.rating for r in all_pro_reviews) / len(all_pro_reviews), 1)
+        pro.total_reviews = len(all_pro_reviews)
 
         inserted += 1
 
